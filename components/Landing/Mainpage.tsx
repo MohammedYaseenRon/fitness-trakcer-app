@@ -3,6 +3,8 @@ import {Header} from './Header';
 import {IoIosFitness}  from "react-icons/io";
 import {MdOutlineTimer} from "react-icons/md";
 import { InfoCard } from '../cards/InfoCard';
+import { About } from '../helper/About';
+import { Features } from './Features';
 
 
 export function Mainpage() {
@@ -25,6 +27,14 @@ export function Mainpage() {
             icon: MdOutlineTimer
         }
     ],[]);
+    
+    const features = useMemo(() => [
+        { id: 1, title: "Start Your Journey", content: "Sign up and create your profile", date: "Day 1" },
+        { id: 2, title: "Set Your Goals", content: "Define your fitness objectives", date: "Week 1" },
+        { id: 3, title: "Begin Workouts", content: "Start your personalized routine", date: "Week 2" },
+        { id: 4, title: "Track Progress", content: "Log your activities and measurements", date: "Month 1" },
+        { id: 5, title: "Milestone Achieved", content: "Celebrate your first big win!", date: "Month 3" },
+    ],[]) 
 
     return (
         <>
@@ -44,6 +54,24 @@ export function Mainpage() {
                 </div>
             </div>
 
+        </div>
+
+        {/* What is Fitness Tracking */}
+        <div className="py-20">
+            <div className="lg:px-44">
+                <p className="text-3xl font-semibold text-center ">
+                    What is <span className="text-blue-500">FitLife</span> ?   
+                </p>
+                <p className="py-6 text-lg text-gray-500 text-center">FitLife offers personalized workout plans, expert-guided exercises, and real-time progress tracking to help you achieve your goals.</p>
+            </div>
+            <About />
+            
+        </div>
+
+        {/* Features */}
+        <div className="py-8 px-4 mx-auto">
+            <h1 className="text-3xl font-bold text-center mb-10">Our Features</h1>
+            <Features items={features} />
         </div>
         </>
         

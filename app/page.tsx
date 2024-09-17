@@ -2,6 +2,7 @@
 import React from 'react'
 import { AppBar } from '../components/Landing/AppBar';
 import { Mainpage } from '@/components/Landing/Mainpage';
+import { Footer } from '@/components/Landing/Footer';
 
 
 export default function LandingPage() {
@@ -11,6 +12,7 @@ export default function LandingPage() {
       <main className="flex-grow">
         <Mainpage />
       </main>
+      <Footer />
     </div>
   )
 }
