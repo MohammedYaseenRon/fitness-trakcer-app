@@ -21,7 +21,6 @@ export const InfoCard: React.FC<InfoCardProps> =  ({data}) => {
                 <p className="text-2xl text-blue-400 text-center">{data.label}</p>
                 <p className="text-center">{data.desc}</p>
             </div>
-
         </div>
     )
 }
