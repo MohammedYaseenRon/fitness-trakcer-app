@@ -1,6 +1,7 @@
 
 import React from 'react'
 import { AppBar } from '../components/Landing/AppBar';
+import { Mainpage } from '@/components/Landing/Mainpage';
 
 
 export default function LandingPage() {
@@ -8,7 +9,7 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen">
       <AppBar />
       <main className="flex-grow">
-        <h1>hello broo</h1>
+        <Mainpage />
       </main>
     </div>
   )

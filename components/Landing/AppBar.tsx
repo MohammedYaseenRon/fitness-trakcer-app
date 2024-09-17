@@ -36,17 +36,17 @@ export const AppBar: React.FC = () => {
                             <Activity className="h-8 w-8" />
                         </Link>
                     </div>
-                    <div className="flex items-center space-x-4 ml-4 md:space-x-6 md:ml-auto">
-                        <div className="hidden md:flex md:items-center md:space-x-4">
+                    <div className="flex items-center justify-center space-x-8 ml-4 md:space-x-6 md:ml-auto">
+                        <div className="hidden md:flex md:items-center md:space-x-8">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     className={`${
                                         pathname === item.href
-                                            ? 'bg-blue-700 text-white'
-                                            : 'text-white hover:bg-blue-500'
-                                    } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300`}
+                                            ? 'text-white border-b-2 border-white'
+                                            : 'text-white hover:border-b-2 hover:border-white'
+                                    } text-sm font-medium transition-all duration-300`}
                                 >
                                     {item.label}
                                 </Link>
@@ -75,24 +75,24 @@ export const AppBar: React.FC = () => {
                     </div>
                 </div>
                 {menuOpen && (
-                    <div className="md:hidden fixed inset-0 bg-blue-800 bg-opacity-90 z-50 flex flex-col">
-                        <div className="px-2 py-2 space-y-1 sm:px-3 flex-grow overflow-auto">
+                    <div className="md:hidden fixed inset-0 bg-blue-800 bg-opacity-90 z-50 flex flex-col items-center justify-center">
+                        <div className="px-4 py-4 space-y-4 flex-grow overflow-auto">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     className={`${
                                         pathname === item.href
-                                            ? 'bg-blue-700 text-white'
-                                            : 'text-white hover:bg-blue-500'
-                                    } block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300`}
+                                            ? 'text-white border-b-2 border-white'
+                                            : 'text-white hover:border-b-2 hover:border-white'
+                                    } block text-base font-medium transition-all duration-300`}
                                 >
                                     {item.label}
                                 </Link>
                             ))}
                             <button
                                 onClick={goToSignup}
-                                className="block px-3 py-2 rounded-md text-base font-medium bg-white text-blue-600 hover:bg-blue-100"
+                                className="block px-4 py-2 rounded-md text-base font-medium bg-white text-blue-600 hover:bg-blue-100"
                             >
                                 Sign Up
                             </button>
