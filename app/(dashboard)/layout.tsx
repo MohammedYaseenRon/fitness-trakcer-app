@@ -12,7 +12,7 @@ export default function Layout({
 }): JSX.Element {
     return (
         <div className="flex">
-            <div className="w-64 border-r border-slate min-h-screen mr-4 pt-28">
+            <div className="w-64 border-r border-slate min-h-screen bg-gray-100 pt-28">
                 <div>
                     <SideBar href={"/dashboard"} icon={<HomeIcon />} title="DashBoard" />
                     <SideBar href={"/workout"} icon={<WorkoutIcon />} title="Workout" />
