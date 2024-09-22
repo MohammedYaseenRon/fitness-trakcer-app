@@ -1,9 +1,7 @@
-
-import React from 'react'
-import { Mainpage } from '@/components/Landing/Mainpage';
-import { Footer } from '@/components/Landing/Footer';
-import { AppBar } from '../components/Landing/AppBar'
-
+import React from 'react';
+import { Mainpage } from '@/components/Landing/Mainpage';  
+import { Footer } from '@/components/Landing/Footer';      
+import { AppBar } from '@/components/Landing/AppBar'; 
 
 export default function LandingPage() {
   return (

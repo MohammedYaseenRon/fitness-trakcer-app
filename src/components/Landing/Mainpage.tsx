@@ -3,7 +3,7 @@ import {Header} from './Header';
 import {IoIosFitness}  from "react-icons/io";
 import {MdOutlineTimer} from "react-icons/md";
 import { InfoCard } from '../cards/InfoCard';
-import { About } from '../helper/About';
+import { About } from '@/components/helper/About';
 import { Features } from './Features';
 
 
