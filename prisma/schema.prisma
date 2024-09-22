@@ -18,5 +18,36 @@ model User {
   email     String  @unique
   username  String  @unique
   password  String
+  weight    Float?
+  height    Float?
+  age       Int
+  schedules Schedule[]
+  activities FitnessActivity[]
 
+}
+
+model Schedule{
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
+  day       String
+  activity  String
+  duration  Int
+}
+
+model FitnessActivity {
+  id     Int   @id @default(autoincrement())
+  userId Int
+  date   DateTime
+  user   User           @relation(fields: [userId], references: [id])
+  calories Int 
+  steps    Int 
+}
+
+model Equipment {
+  id        Int     @id @default(autoincrement())
+  name      String
+  stock     Int
+  discout   Float
+  price     Float
 }
