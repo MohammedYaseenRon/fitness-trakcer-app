@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { SideBar } from '@/components/SideBar';
+import { SideBar } from '@/src/components/SideBar';
 import { MdOutlineFitnessCenter } from "react-icons/md";
 
 

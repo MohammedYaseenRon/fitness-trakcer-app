@@ -1,7 +1,7 @@
 import React from 'react';
-import { Layout } from '@/components/Layout';
-import { WelcomeCard } from '@/components/WelcomeCard';
-import { StatsCard } from '@/components/StatsCard';
+import { Layout } from '@/src/components/Layout';
+import { WelcomeCard } from '@/src/components/WelcomeCard';
+import { StatsCard } from '@/src/components/StatsCard';
 import { Activity, Clock, Dumbbell } from 'lucide-react'
 
 
