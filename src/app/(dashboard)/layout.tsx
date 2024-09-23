@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { SideBar } from '@/src/components/SideBar';
+import { SideBar } from '@/components/SideBar';
 import { MdOutlineFitnessCenter } from "react-icons/md";
 
 
@@ -12,7 +12,7 @@ export default function Layout({
 }): JSX.Element {
     return (
         <div className="flex">
-            <div className="w-64 border-r border-slate min-h-screen bg-gray-100 pt-28">
+            <div className="w-64 border-r border-slate min-h-screen bg-gray-100 pt-28 px-3">
                 <div>
                     <SideBar href={"/dashboard"} icon={<HomeIcon />} title="DashBoard" />
                     <SideBar href={"/workout"} icon={<WorkoutIcon />} title="Workout" />
@@ -23,7 +23,7 @@ export default function Layout({
             </div>
             {children}
         </div>
-    )
+    );
 }
 
 //Icons used from react-icons

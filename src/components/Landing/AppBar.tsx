@@ -25,7 +25,7 @@ export const AppBar: React.FC = () => {
 
     const goToSignup = () => {
         router.push("/signup");
-        setMenuOpen(false); // Close the menu after navigating
+        setMenuOpen(false); 
     };
 
     return (
@@ -33,6 +33,7 @@ export const AppBar: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <div className="flex items-center">
+                        <h1 className="text-2xl px-3 font-frank">Fit 4 <span className="text-amber-200">You</span></h1>
                         <Link href="/" className="flex-shrink-0">
                             <Activity className="h-8 w-8" />
                         </Link>

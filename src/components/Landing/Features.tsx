@@ -50,12 +50,12 @@ export const Features: React.FC<FeaturesProps> = ({ items }) => {
                 >
                     <div className="order-1 w-5/12"></div>
                     <div className="z-20 flex items-center order-1 bg-blue-500 shadow-xl w-8 h-8 rounded-full">
-                        <h1 className="mx-auto font-semibold text-lg text-white">{index + 1}</h1>
+                        <h1 className="mx-auto font-semibold text-lg">{index + 1}</h1>
                     </div>
                     <div className="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
-                        <h3 className="mb-3 font-bold text-gray-800 text-xl">{item.title}</h3>
-                        <p className="text-sm leading-snug tracking-wide text-gray-600">{item.content}</p>
-                        <p className="mt-2 text-xs text-gray-500">{item.date}</p>
+                        <h3 className="mb-3 font-bold font-frank text-gray-800 text-2xl">{item.title}</h3>
+                        <p className="text-sm leading-snug tracking-wide text-gray-900">{item.content}</p>
+                        <p className="mt-2 text-xs text-gray-400">{item.date}</p>
                     </div>
                 </div>
             ))}

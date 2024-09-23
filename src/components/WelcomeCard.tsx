@@ -8,7 +8,7 @@ interface WelcomeCardProps {
 
 export const WelcomeCard: React.FC<WelcomeCardProps> = ({name}) => {
     return (
-        <div className="bg-cyan-400 text-white rounded-lg shadow-md flex items-center justify-between ml-4 px-44 py-1">
+        <div className="bg-cyan-400 text-white rounded-lg shadow-md flex items-center justify-between px-6 py-4">
             <div>
                 <h2 className="text-white text-2xl font-bold font-frank mb-2">Hello, {name}</h2>
                 <p className="text-white text-3xl font-extrabold font-frank mb-4">Welcome Back!</p>
