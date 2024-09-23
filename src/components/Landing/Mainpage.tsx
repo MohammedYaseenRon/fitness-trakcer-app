@@ -33,7 +33,7 @@ export function Mainpage() {
         { id: 2, title: "Set Your Goals", content: "Define your fitness objectives", date: "Week 1" },
         { id: 3, title: "Begin Workouts", content: "Start your personalized routine", date: "Week 2" },
         { id: 4, title: "Track Progress", content: "Log your activities and measurements", date: "Month 1" },
-        { id: 5, title: "Milestone Achieved", content: "Celebrate your first big win!", date: "Month 3" },
+        { id: 5, title: "Milestone Achieved", content: "Celebrate your first big win!", date: "Month 1" },
     ],[]) 
 
     return (
@@ -70,7 +70,7 @@ export function Mainpage() {
 
         {/* Features */}
         <div className="py-8 px-4 mx-auto">
-            <h1 className="text-3xl font-bold text-center mb-10">Our Features</h1>
+            <h1 className="text-3xl font-bold text-center mb-10">Our <span className='text-blue-500'>Features</span></h1>
             <Features items={features} />
         </div>
         </>
