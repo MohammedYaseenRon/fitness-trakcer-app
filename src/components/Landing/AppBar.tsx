@@ -5,6 +5,7 @@ import { Menu, X, Activity } from 'lucide-react';
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+
 interface NavItem {
     label: string;
     href: string;

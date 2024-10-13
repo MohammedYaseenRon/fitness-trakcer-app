@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import axios from 'axios'
 
-export default function SignUp() {
-  const [name, setName] = useState('')
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -17,24 +16,20 @@ export default function SignUp() {
     setError(null)
 
     try {
-      const response = await axios.post('/api/auth/signup', { name, email, password })
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
 
-      if (response.status === 201) {
-        const result = await signIn('credentials', {
-          email,
-          password,
-          redirect: false,
-        })
-
-        if (result?.error) {
-          setError('Failed to sign in after account creation. Please try logging in.')
-        } else {
-          router.push('/dashboard')
-        }
+      if (result?.error) {
+        setError('Invalid email or password')
+      } else {
+        router.push('/dashboard')
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        setError(error.response.data.error || 'Failed to create account. Please try again.')
+        setError(error.response.data.error || 'An error occurred during login. Please try again.')
       } else {
         setError('An unexpected error occurred. Please try again.')
       }
@@ -43,20 +38,10 @@ export default function SignUp() {
 
   return (
     <div className="max-w-md mx-auto mt-8 border border-gray-200 shadow-lg p-6 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-      <p className="text-gray-600 mb-6">Create a new account</p>
+      <h2 className="text-2xl font-bold mb-4">Login</h2>
+      <p className="text-gray-600 mb-6">Enter your credentials to access your account</p>
       <form onSubmit={handleSubmit}>
         <div className="grid gap-4">
-          <div className="flex flex-col space-y-1.5">
-            <label htmlFor="name" className="font-medium">Name</label>
-            <input 
-              id="name" 
-              className="border border-gray-300 p-2 rounded-md"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
           <div className="flex flex-col space-y-1.5">
             <label htmlFor="email" className="font-medium">Email</label>
             <input 
@@ -83,17 +68,10 @@ export default function SignUp() {
         </div>
         <div className="flex justify-between mt-6">
           <button 
-            type="button" 
-            className="bg-transparent border border-gray-500 text-gray-500 py-2 px-4 rounded-md"
-            onClick={() => router.push('/login')}
-          >
-            Login
-          </button>
-          <button 
             type="submit" 
             className="bg-blue-500 text-white py-2 px-4 rounded-md"
           >
-            Sign Up
+            Login
           </button>
         </div>
       </form>
