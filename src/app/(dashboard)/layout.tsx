@@ -28,10 +28,10 @@ export default function Layout({
 
 //Icons used from react-icons
 function HomeIcon() {
-return <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24">
-<path d="M3 9.6V20a2 2 0 002 2h14a2 2 0 002-2V9.6l-10-6z" fill="#4CAF50"/>
-<path d="M9 21V12h6v9h-6z" fill="#8BC34A" />
-</svg>
+    return <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24">
+    <path d="M3 9.6V20a2 2 0 002 2h14a2 2 0 002-2V9.6l-10-6z" fill="#4CAF50"/>
+    <path d="M9 21V12h6v9h-6z" fill="#8BC34A" />
+    </svg>
 
 }
 

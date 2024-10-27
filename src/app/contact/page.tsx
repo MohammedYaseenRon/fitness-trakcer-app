@@ -3,7 +3,7 @@ import ContactForm from "@/components/Contact";
 
 export default function Contact() {
     return (
-        <div className="px-32 py-12">
+        <div className="bg-gray-100 min-h-screen w-screen flex justify-center items-center">
             <ContactForm />
         </div>
     )
