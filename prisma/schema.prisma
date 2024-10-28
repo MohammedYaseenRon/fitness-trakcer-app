@@ -18,12 +18,12 @@ model User {
   name      String  @unique
   email     String  @unique
   password  String
-  weight    Float
-  height    Float
-  age       Int
-  dailyCalories  Int
-  fitnessGoal     String
-  activityLevel   String
+  weight    String?
+  height    Float?
+  age       Int?
+  dailyCalories Int?     @default(2000)
+  fitnessGoal   String?  @default("MAINTAIN")
+  activityLevel String?  @default("MODERATE")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   schedules Schedule[]
