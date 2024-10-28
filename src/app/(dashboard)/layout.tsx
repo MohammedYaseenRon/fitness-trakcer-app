@@ -12,13 +12,24 @@ export default function Layout({
 }): JSX.Element {
     return (
         <div className="flex">
-            <div className="w-64 border-r border-slate min-h-screen bg-gray-100 pt-28 px-3">
-                <div>
+            <div className="w-64 border-r border-slate min-h-screen bg-gray-100">
+                <div className='flex justify-center items-center py-4 border-b border-slate-200'>
+                    <h1 className="text-2xl font-bold text-blue-600">Fit4u</h1>
+                </div>
+                <div className="px-3 py-8">
                     <SideBar href={"/dashboard"} icon={<HomeIcon />} title="DashBoard" />
                     <SideBar href={"/workout"} icon={<WorkoutIcon />} title="Workout" />
                     <SideBar href={"/nutrition"} icon={<NutritionIcon />} title="Nutrition" />
                     <SideBar href={"/fitness"} icon={<FitnessIcon />} title="Fitness" />
-                    <SideBar href={"/diet"} icon={<DietIcon />} title="Diet" />
+                    <SideBar href={"/diet"} icon={<DietIcon />} title="Diet" />    
+                </div>
+                <div className='px-14 py-4 mt-[240px] border-slate-200'>
+                    <button className='text-lg text-gray-500 font-semibold w-full text-left py-2 hover:text-blue-600 transition-colors'>
+                        Settings
+                    </button>
+                    <button className='text-lg text-gray-500 font-semibold w-full text-left py-2 hover:text-blue-600 transition-colors'>
+                        Logout
+                    </button>
                 </div>
             </div>
             {children}
