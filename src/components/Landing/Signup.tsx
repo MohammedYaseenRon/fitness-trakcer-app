@@ -24,12 +24,14 @@ export default function SignUp() {
           email,
           password,
           redirect: false,
-        })
+        });
+
+        console.log("Sign-in result:", result);
 
         if (result?.error) {
-          setError('Failed to sign in after account creation. Please try logging in.')
-        } else {
-          router.push('/dashboard')
+          setError('Failed to sign in after account creation. Please try logging in.');
+        } else if(result?.ok) {
+          router.push('/dashboard');
         }
       }
     } catch (error) {
@@ -91,7 +93,7 @@ return (
             <button 
                 type="button" 
                 className="bg-transparent border border-gray-500 text-gray-500 py-2 px-4 rounded-md"
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/dashboard')}
             >
                 Login
             </button>

@@ -79,8 +79,10 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account, profile }) {
+      if (account?.provider === "google" && (profile as any)?.email_verified && (profile as any)?.email?.endsWith("@example.com")) {
+        token.email_verified = true;
+      } else if (user) {
         token.id = user.id;
         token.name = user.name;
       }
@@ -95,6 +97,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/signup",
+    signIn: "/login",
   },
 };
