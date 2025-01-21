@@ -14,56 +14,70 @@ datasource db {
 }
 
 model User {
-  id   Int    @id @default(autoincrement())
-  name      String  @unique
-  email     String  @unique
-  password  String
-  weight    String?
-  height    Float?
-  age       Int?
-  dailyCalories Int?     @default(2000)
-  fitnessGoal   String?  @default("MAINTAIN")
-  activityLevel String?  @default("MODERATE")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  schedules Schedule[]
-  activities FitnessActivity[]
-  progress   ProgressRecord[]
+  id            Int               @id @default(autoincrement())
+  name          String            @unique
+  email         String            @unique
+  password      String
+  weight        String?
+  height        Float?
+  age           Int?
+  dailyCalories Int?              @default(2000)
+  fitnessGoal   String?           @default("MAINTAIN")
+  activityLevel String?           @default("MODERATE")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  schedules     Schedule[]
+  activities    FitnessActivity[]
+  progress      ProgressRecord[]
+  workout       Workout[]
+}
+
+model Workout {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  duration    String
+  difficulty   String
+  goals       String
+  body        String
+  userId      Int
+  User        User   @relation(fields: [userId], references: [id])
+  
 }
 
 model ProgressRecord {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   userId    Int
   date      DateTime
   weight    Float
   calories  Int
   steps     Int
   createdAt DateTime @default(now())
-  user  User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
-model Schedule{
-  id        Int        @id @default(autoincrement())
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
-  day       String
-  activity  String
-  duration  Int
+model Schedule {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  user     User   @relation(fields: [userId], references: [id])
+  day      String
+  activity String
+  duration Int
 }
 
 model FitnessActivity {
-  id     Int   @id @default(autoincrement())
-  userId Int
-  date   DateTime
-  user   User           @relation(fields: [userId], references: [id])
-  calories Int 
-  steps    Int 
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  date     DateTime
+  user     User     @relation(fields: [userId], references: [id])
+  calories Int
+  steps    Int
 }
 
 model Equipment {
-  id        Int     @id @default(autoincrement())
-  name      String
-  stock     Int
-  discout   Float
-  price     Float
+  id      Int    @id @default(autoincrement())
+  name    String
+  stock   Int
+  discout Float
+  price   Float
 }
