@@ -1,9 +1,12 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Modal from "./Modal";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import axios from "axios";
+import { title } from "process";
+import toast from "react-hot-toast";
 
 
 
@@ -12,49 +15,78 @@ interface WorkoutCardsProps {
   description: string;
   duration: string; // Changed to string for flexibility
   difficulty: string;
-  goals:string;
-  body:string;
+  goals: string;
+  body: string;
 }
 
 interface ModalProps {
-    id?: string | null;
-    isOpen: boolean;
-    onClose: () => void;
-    name: string;
-    width?:string;
-    height?:string
-    className?:string
-  
+  id?: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+  name: string;
+  width?: string;
+  height?: string
+  className?: string
+
 }
 
 export default function WorkoutCards({
-    isOpen, onClose, name,className 
+  isOpen, onClose, name, className
 }: ModalProps) {
-    const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState<string | null>(null);
-    const [formData, setFormData] = useState<WorkoutCardsProps>({
-      title: "",
-      description: "",
-      duration: "",
-      difficulty: "",
-      goals: "",
-      body: "",
-  
-    })
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string | null>(null);
+  const [isBookMarked, setIsBookMarked] = useState(false);
+  const [formData, setFormData] = useState<WorkoutCardsProps>({
+    title: "",
+    description: "",
+    duration: "",
+    difficulty: "",
+    goals: "",
+    body: "",
 
-    const handleInputChange =  (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name,value} = e.target;
-        setFormData((prev => ({...prev, [name]:value})))
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev => ({ ...prev, [name]: value })))
+
+  }
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const userId = 1;
+      const response = await axios.post("api/workout", {
+        ...formData, userId,
+      })
+      console.log(response.data);
+      if (response.status == 201) {
+        setFormData({
+          title: "",
+          description: "",
+          duration: "",
+          difficulty: "",
+          goals: "",
+          body: "",
+        });
+      }
+      toast.success("Successfully created workout plan");
+    } catch (error) {
+      toast.error("Error while creating workout plan");
+      console.log("Error while creatting workouts");
 
     }
+  }
   return (
     <Modal isOpen={isOpen} onClose={onClose} name={name}>
-      <form  className="space-y-6 p-6">
+      <form className="space-y-6 p-6">
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700" htmlFor="projectName">Workout Title</Label>
+          <Label className="text-sm font-medium text-gray-700" htmlFor="workout">Workout Title</Label>
           <Input
-            id="workout"
-            name="workout"
+            id="title"
+            name="title"
             placeholder='Enter a workout name'
             value={formData.title}
             onChange={handleInputChange}
@@ -64,8 +96,8 @@ export default function WorkoutCards({
         <div className="space-y-2">
           <Label className="text-sm font-medium text-gray-700" htmlFor="projectDescription">Description</Label>
           <Textarea
-            id="workoutDescription"
-            name="workoutDescription"
+            id="description"
+            name="description"
             placeholder='Enter a workout description'
             value={formData.description}
             onChange={handleInputChange}
@@ -111,8 +143,8 @@ export default function WorkoutCards({
         <div className="space-y-2">
           <Label className="text-sm font-medium text-gray-700" htmlFor="sourcecode">Body Part</Label>
           <Input
-            id="bodyPart"
-            name="bodyPart"
+            id="body"
+            name="body"
             placeholder='Body Part'
             value={formData.body}
             onChange={handleInputChange}
@@ -120,7 +152,7 @@ export default function WorkoutCards({
           />
         </div>
         <div className='flex flex-row-reverse'>
-          <Button type="submit" className="w-full h-[50px]" disabled={loading}>
+          <Button onClick={handleSubmit} type="submit" className="w-full h-[50px]" disabled={loading}>
             Create Workout Plan
           </Button>
         </div>
