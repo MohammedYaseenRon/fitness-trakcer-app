@@ -30,6 +30,7 @@ model User {
   activities    FitnessActivity[]
   progress      ProgressRecord[]
   workout       Workout[]
+  bookmark    Bookmark[]
 }
 
 model Workout {
@@ -37,12 +38,25 @@ model Workout {
   title       String
   description String
   duration    String
-  difficulty   String
+  difficulty  String
   goals       String
   body        String
   userId      Int
   User        User   @relation(fields: [userId], references: [id])
-  
+  bookmark    Bookmark[]
+}
+
+model Bookmark {
+  id        Int      @id @default(autoincrement())
+  workoutId Int
+  Workout   Workout  @relation(fields: [workoutId], references: [id])
+  userId    Int
+  User        User   @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, workoutId]) // Composite unique key
+
+
 }
 
 model ProgressRecord {

@@ -50,7 +50,7 @@ export async function GET(req:NextRequest) {
               message: 'Content created successfully',
               data: workouts
             },
-            { status: 201 }
+            { status: 200 }
           );
     }catch(error) {
         console.error("Error while creating workouts:", error);
