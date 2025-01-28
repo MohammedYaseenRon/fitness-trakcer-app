@@ -18,7 +18,15 @@ export async function POST(req: NextRequest) {
             }
         });
         if (existingBookmark) {
-            return NextResponse.json({ error: "Already Bookmarked" }, { status: 400 });
+            await prisma.bookmark.delete({
+                where: {
+                    userId_workoutId: {
+                        userId,
+                        workoutId
+                    }
+                }
+            });
+            return NextResponse.json({ true: "UnBookmarked successfully" }, { status: 200 });
         }
 
         const newBookmark = await prisma.bookmark.create({
@@ -37,7 +45,7 @@ export async function POST(req: NextRequest) {
         );
 
     } catch (error) {
-        console.error("Error while creating bookmarking",error);
+        console.error("Error while creating bookmarking", error);
         return NextResponse.json({ error: "Server error while Bookmarking" }, { status: 500 });
 
     }
@@ -50,17 +58,17 @@ export async function GET(req: NextRequest) {
         if (!userId) {
             return NextResponse.json({ success: false, error: "Missing userId parameter" }, { status: 400 });
         }
-        
+
         const bookmark = await prisma.bookmark.findMany({
-            where:{
+            where: {
                 userId: parseInt(userId)
             },
-            include:{
-                Workout:true
+            include: {
+                Workout: true
             }
         });
         return NextResponse.json({ success: true, data: bookmark }, { status: 200 });
-    }catch(error){
+    } catch (error) {
         return NextResponse.json({ success: false, error: "Failed to fetch bookmarks" }, { status: 200 });
         console.error("Error while fetching all bookmarks");
     }

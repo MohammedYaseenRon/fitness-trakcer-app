@@ -15,7 +15,7 @@ import { Bookmark, BookmarkPlus } from "lucide-react"; // Import Lucide Icons
 
 
 interface WorkoutCardsProps {
-    id:number
+    id: number
     title: string;
     description: string;
     duration: string; // Changed to string for flexibility
@@ -29,7 +29,7 @@ export default function () {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState({}); // Track bookmarks by ID
+    const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState<Record<number, boolean>>({});
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -38,22 +38,28 @@ export default function () {
         setIsModalOpen(false);
     }
 
-    const handleBookMark = async (e: React.FormEvent, workoutId:number) => {
+    const handleBookMark = async (e: React.FormEvent, workoutId: number) => {
         e.preventDefault();
         try {
             const userId = 1;
+            setBookmarkedWorkouts((prevState) => ({
+                ...prevState,
+                [workoutId]: !prevState[workoutId],
+            }));
+    
+
             const response = await axios.post("api/bookmark", {
                 userId,
-                workoutId
+                workoutId,
             });
             if (response.status == 201) {
-                setBookmarkedWorkouts((prev) => ({
-                    ...prev,
-                    [workoutId]: true, // Mark the specific workout as bookmarked
-                }));
-                toast.success("Bookmarked succesfully");
-            } else {
-                toast.error("Failed to bookmark");
+                toast.success("Bookmarked successfully");
+            }else if (response.status === 200) {
+                // If unbookmarked, show a success message
+                toast.success("Unbookmarked successfully");
+            }else{
+                toast.error("Something went wrong");
+
             }
             console.log(response.data);
         } catch (error) {
@@ -158,12 +164,11 @@ export default function () {
                                     <div>
                                         <button
                                             onClick={(e) => {
-                                                handleBookMark(e,workout.id); // Replace `123` with the actual workout ID
-                                                setBookmarkedWorkouts(!bookmarkedWorkouts);
+                                                handleBookMark(e, workout.id);
                                             }}
                                             className="p-2"
                                         >
-                                            {bookmarkedWorkouts ? (
+                                            {bookmarkedWorkouts[workout.id] ? (
                                                 <Bookmark className="text-orange-500" />
                                             ) : (
                                                 <BookmarkPlus className="text-gray-500" />
