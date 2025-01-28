@@ -18,7 +18,7 @@ model User {
   name          String            @unique
   email         String            @unique
   password      String
-  weight        String?
+  weight        Float?
   height        Float?
   age           Int?
   dailyCalories Int?              @default(2000)
@@ -30,11 +30,18 @@ model User {
   activities    FitnessActivity[]
   progress      ProgressRecord[]
   workout       Workout[]
-  bookmark    Bookmark[]
+  bookmark      Bookmark[]
+}
+
+model chatMessage{
+  id        String   @id @default(cuid())
+  role      String
+  content   String
+  createdAt DateTime @default(now())
 }
 
 model Workout {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
   description String
   duration    String
@@ -42,14 +49,21 @@ model Workout {
   goals       String
   body        String
   userId      Int
-  User        User   @relation(fields: [userId], references: [id])
+  User        User       @relation(fields: [userId], references: [id])
   bookmark    Bookmark[]
-  exercise  String
-  sets      Int
-  reps      Int
-  weight    Float
-  calories  Float
-  date      DateTime @default(now())
+  exercise    Exercise[]
+  date        DateTime   @default(now())
+}
+
+model Exercise {
+  id        Int     @id @default(autoincrement())
+  name      String
+  sets      Int?
+  reps      Int?
+  weight    Float?
+  calories  Float?
+  workoutId Int
+  workout   Workout @relation(fields: [workoutId], references: [id])
 }
 
 model Bookmark {
@@ -57,12 +71,11 @@ model Bookmark {
   workoutId Int
   Workout   Workout  @relation(fields: [workoutId], references: [id])
   userId    Int
-  User        User   @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@unique([userId, workoutId]) // Composite unique key
-
-
 }
 
 model ProgressRecord {
@@ -98,6 +111,6 @@ model Equipment {
   id      Int    @id @default(autoincrement())
   name    String
   stock   Int
-  discout Float
+  discount Float
   price   Float
 }

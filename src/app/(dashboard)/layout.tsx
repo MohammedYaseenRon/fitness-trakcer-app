@@ -1,3 +1,4 @@
+import { FloatingChatbot } from '@/components/FloatingChatbot';
 import { SideBar } from '@/components/SideBar'
 import { Inter } from 'next/font/google'
 
@@ -23,6 +24,7 @@ export default function DashboardLayout({
       <SideBar />
       <div className="flex-1 flex flex-col h-screen overflow-y-auto">
         <main className="flex-1 bg-[#F8F9FC]">{children}</main>
+        <FloatingChatbot />
       </div>
     </div>
   );

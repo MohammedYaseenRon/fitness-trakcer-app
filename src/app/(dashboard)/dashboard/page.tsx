@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from '@/components/Layout';
-import { Activity, Clock, Dumbbell, User, Calendar, TrendingUp } from 'lucide-react';
+import { Activity, Clock, Dumbbell, User, Calendar, TrendingUp, UserIcon } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -11,15 +11,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Profile from '@/components/Profile';
+import { useSession } from "next-auth/react";
+import axios from 'axios';
+
+
 
 interface UserData {
-  name: string;
-  weight: number;
-  height: number;
-  age: number;
-  dailyCalories: number;
-  fitnessGoal: string;
-  activityLevel: string;
+  data: {
+    name: string;
+    weight: number;
+    height: number;
+    age: number;
+    dailyCalories: number;
+    fitnessGoal: string;
+    activityLevel: string;
+  };
+  success: boolean;
+  message: string;
 }
 
 const mockProgressData = [
@@ -32,22 +41,45 @@ const mockProgressData = [
 const Dashboard = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [showForm, setShowForm] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
+  const { data: session } = useSession();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get('name') as string,
-      weight: Number(formData.get('weight')),
-      height: Number(formData.get('height')),
-      age: Number(formData.get('age')),
-      dailyCalories: Number(formData.get('dailyCalories')),
-      fitnessGoal: formData.get('fitnessGoal') as string,
-      activityLevel: formData.get('activityLevel') as string,
-    };
-    setUserData(data);
-    setShowForm(false);
-  };
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get("api/user");
+          if (response.status == 200) {
+            setUserData(response.data); // Set the fetched user data
+          } else {
+            console.error(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+      fetchUserData();
+    }
+  }, [session])
+
+
+
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.currentTarget);
+  //   const data = {
+  //     name: formData.get('name') as string,
+  //     weight: Number(formData.get('weight')),
+  //     height: Number(formData.get('height')),
+  //     age: Number(formData.get('age')),
+  //     dailyCalories: Number(formData.get('dailyCalories')),
+  //     fitnessGoal: formData.get('fitnessGoal') as string,
+  //     activityLevel: formData.get('activityLevel') as string,
+  //   };
+  //   setUserData(data);
+  //   setShowForm(false);
+  // };
 
   const StatsCard = ({ title, value, unit, icon, description }: any) => (
     <Card className="hover:shadow-lg transition-shadow w-full">
@@ -64,114 +96,51 @@ const Dashboard = () => {
     </Card>
   );
 
-  const content = showForm ? (
-    <div className="w-full min-h-screen bg-gray-50 p-4 overflow-y-auto">
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Welcome to FitTrack</CardTitle>
-          <CardDescription className="text-center">Let's get started with your fitness journey</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Name</label>
-                <input
-                  name="name"
-                  type="text"
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Age</label>
-                <input
-                  name="age"
-                  type="number"
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Weight (kg)</label>
-                <input
-                  name="weight"
-                  type="number"
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Height (cm)</label>
-                <input
-                  name="height"
-                  type="number"
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Daily Calories Target</label>
-                <input
-                  name="dailyCalories"
-                  type="number"
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Fitness Goal</label>
-                <select name="fitnessGoal" className="w-full p-2 border rounded-md" required>
-                  <option value="weight-loss">Weight Loss</option>
-                  <option value="muscle-gain">Muscle Gain</option>
-                  <option value="maintenance">Maintenance</option>
-                </select>
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Start Your Journey
-            </button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  ) : (
+  return (
     <div className="w-full min-h-screen bg-gray-50 p-4 overflow-y-auto">
       <div className="w-full">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Welcome back, {userData?.name}! 🎯</h1>
-          <p className="text-gray-600">Let's check your progress today</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Welcome back, {session?.user?.name   || userData?.data.name}! 🎯</h1>
+            <p className="text-gray-600">Let's check your progress today</p>
+          </div>
+          <button
+            onClick={() => setShowProfile(!showProfile)}
+            className="p-2 rounded-full hover:bg-gray-200"
+          >
+            <UserIcon className="h-6 w-6 text-gray-700" />
+          </button>
         </div>
+
+        {showProfile && <Profile />}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatsCard
             title="Daily Calories"
-            value={userData?.dailyCalories}
+            value={userData?.data.dailyCalories}
             unit="kcal"
             icon={<Activity className="h-4 w-4 text-blue-600" />}
             description="Daily caloric target"
           />
           <StatsCard
             title="Current Weight"
-            value={userData?.weight}
+            value={userData?.data.weight}
             unit="kg"
             icon={<TrendingUp className="h-4 w-4 text-green-600" />}
             description="Last updated today"
           />
           <StatsCard
-            title="Fitness Goal"
-            value={userData?.fitnessGoal?.replace('-', ' ')}
+            title="Height"
+            value={userData?.data.height}
+            unit="cm"
             icon={<Dumbbell className="h-4 w-4 text-purple-600" />}
-            description="Current objective"
+            description="Current height"
           />
           <StatsCard
             title="Age"
-            value={userData?.age}
+            value={userData?.data.age}
             unit="years"
             icon={<User className="h-4 w-4 text-orange-600" />}
             description="Profile information"
@@ -192,10 +161,10 @@ const Dashboard = () => {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="weight" 
-                    stroke="#2563eb" 
+                  <Line
+                    type="monotone"
+                    dataKey="weight"
+                    stroke="#2563eb"
                     strokeWidth={2}
                   />
                 </LineChart>
@@ -215,16 +184,16 @@ const Dashboard = () => {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="steps" 
-                    stroke="#16a34a" 
+                  <Line
+                    type="monotone"
+                    dataKey="steps"
+                    stroke="#16a34a"
                     strokeWidth={2}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="calories" 
-                    stroke="#dc2626" 
+                  <Line
+                    type="monotone"
+                    dataKey="calories"
+                    stroke="#dc2626"
                     strokeWidth={2}
                   />
                 </LineChart>
@@ -236,7 +205,6 @@ const Dashboard = () => {
     </div>
   );
 
-  return content;
 };
 
 export default Dashboard;

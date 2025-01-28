@@ -49,12 +49,6 @@ export const authOptions: NextAuthOptions = {
               email: credentials.email,
               password: hashedPassword,
               name: credentials.email.split('@')[0], // Use the email prefix as name
-              weight: '0', // Default value
-              height: 0, // Default value
-              dailyCalories: 2000, // Default value
-              fitnessGoal: 'MAINTAIN', // Default value
-              activityLevel: 'MODERATE', // Default value
-              age: 0 // Default value
             },
           });
 
@@ -70,8 +64,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
     }),
   ],
   session: {
@@ -80,21 +74,45 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user, account, profile }) {
-      if (account?.provider === "google" && (profile as any)?.email_verified && (profile as any)?.email?.endsWith("@example.com")) {
-        token.email_verified = true;
+      // Log the profile object for debugging
+      console.log("Profile object:", profile);
+
+      if (account?.provider === "google" && profile) {
+        if (profile.email && (profile as any).email_verified) {
+          token.email_verified = (profile as any).email_verified; // Set email_verified in the token
+        }
+        console.log("Token object before update:", token);
+
+        token.id = profile.sub;
+        token.name = profile.name || profile.email?.split('@')[0]; // Use profile name or email prefix
+        token.email = profile.email;
+
+        // Log the token object after update
+        // console.log("Token object after update:", token);
       } else if (user) {
         token.id = user.id;
         token.name = user.name;
+        token.email = user.email;
       }
       return token;
+
     },
     async session({ session, token }: { session: any; token: any }) {
       if (session.user) {
+        // console.log("Token object in session callback:", token);
+
         session.user.id = token.id;
         session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.email_verified = token.email_verified;
+
+        // console.log("Session object:", session);
+
       }
       return session;
     },
+
+
   },
   pages: {
     signIn: "/login",
