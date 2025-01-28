@@ -32,6 +32,7 @@ import {
     BriefcaseBusiness,
     Umbrella,
     Mail,
+    Dumbbell,
   } from "lucide-react";
   import Link from "next/link";
 
@@ -58,7 +59,13 @@ export const SideBar = () => {
           label: "Workout",
           icon: ShieldCheck,
         },
+        {
+            href: "/progress",
+            label: "Progress",
+            icon: ShieldCheck,
+          },
         { href: "/nutrition", label: "Nutrition", icon: BriefcaseBusiness },
+        { href: "/excercises", label: "Excercises", icon: Dumbbell },
         { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
         { href: "/goal", label: "Goal setting", icon: UserCircle },
     ]

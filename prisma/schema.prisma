@@ -44,6 +44,12 @@ model Workout {
   userId      Int
   User        User   @relation(fields: [userId], references: [id])
   bookmark    Bookmark[]
+  exercise  String
+  sets      Int
+  reps      Int
+  weight    Float
+  calories  Float
+  date      DateTime @default(now())
 }
 
 model Bookmark {

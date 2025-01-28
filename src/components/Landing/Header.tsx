@@ -1,35 +1,50 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 
 export const Header: React.FC = () => {
   return (
-    <div className="lg:h-screen overflow-x-hidden bg-blue-600">
-      <div className="py-10 px-12 lg:px-32 lg:py-20 flex flex-col lg:flex-row gap-16 items-center justify-center">
-        <div className="grid gap-4 flex-1">
-          <h1 className="text-5xl font-frank text-white leading-tight">
-            Set <span className="text-amber-200">Goals </span>and Achieve <span className="text-amber-200">Milestones</span>
-          </h1>
-          <p className="text-white text-lg font-frank leading-7">
-            Set achievable fitness goals and track your milestones with ease. Our app allows you to create custom fitness plans, set targets, and monitor your progress over time. Celebrate your achievements and stay on track with reminders and motivational prompts designed to keep you focused and engaged.
-          </p>
-          <div className="leading-9">
-            <button
-              type="button"
-              className="py-2.5 px-5 me-2 mb-2 font-frank text-base font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100"
-            >
-              Get Started
-            </button>
+    <div className="min-h-screen w-full overflow-x-hidden bg-blue-600">
+      <div className="container mx-auto px-4 py-8 md:px-8 lg:px-12 xl:px-18 2xl:px-24">
+        <div className="flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-16 xl:gap-24">
+          {/* Text Content */}
+          <div className="flex-1 space-y-6">
+            <h1 className="text-4xl font-frank leading-tight text-white md:text-5xl lg:text-6xl">
+              Set <span className="text-amber-200">Goals </span>
+              and Achieve{" "}
+              <span className="text-amber-200">Milestones</span>
+            </h1>
+
+            <p className="font-frank text-lg leading-relaxed text-white md:text-xl">
+              Set achievable fitness goals and track your milestones with ease.
+              Our app allows you to create custom fitness plans, set targets,
+              and monitor your progress over time. Celebrate your achievements
+              and stay on track with reminders and motivational prompts designed
+              to keep you focused and engaged.
+            </p>
+
+            <div className="pt-4">
+              <Link href="/signup"><button
+                type="button"
+                className="rounded-lg bg-white px-6 py-3 font-frank text-base font-medium text-gray-900 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                Get Started
+              </button></Link>
+            </div>
           </div>
-        </div>
-        <div className="flex-1">
-          <div style={{ position: 'relative', width: '500px', height: '400px' }}>
-            <Image
-              src="/Assets/fitness.png"
-              alt="Fitness"
-              layout="fill"
-              objectFit="cover"
-            />
+
+          {/* Image Container */}
+          <div className="flex-1">
+            <div className="relative h-[400px] w-full max-w-[500px] lg:h-[500px]">
+              <Image
+                src="/Assets/fitness.png"
+                alt="Fitness"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+              />
+            </div>
           </div>
         </div>
       </div>

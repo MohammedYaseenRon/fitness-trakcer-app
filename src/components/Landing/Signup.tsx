@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import axios from 'axios'
+import Link from 'next/link'
 
 export default function SignUp() {
   const [name, setName] = useState('')
@@ -90,13 +91,13 @@ return (
             {error && <p className="text-red-500 text-sm">{error}</p>}
             </div>
             <div className="flex justify-between mt-6">
-            <button 
+            <Link href="/login"><button 
                 type="button" 
                 className="bg-transparent border border-gray-500 text-gray-500 py-2 px-4 rounded-md"
-                onClick={() => router.push('/dashboard')}
+                
             >
                 Login
-            </button>
+            </button></Link>
             <button 
                 type="submit" 
                 className="bg-blue-500 text-white py-2 px-4 rounded-md"

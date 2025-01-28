@@ -14,7 +14,7 @@ interface NavItem {
 const navItems: NavItem[] = [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
-    { label: "Contact", href: "/contact" }
+    // { label: "Contact", href: "/contact" }
 ];
 
 export const AppBar: React.FC = () => {

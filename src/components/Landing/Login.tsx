@@ -16,16 +16,14 @@ export default function Login() {
     setError(null)
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await axios.post('/api/auth/login',{
+        email,password
       })
 
-      if (result?.error) {
-        setError('Invalid email or password')
+         if (response.status == 200) {
+          router.push('/dashboard');
       } else {
-        router.push('/dashboard')
+        setError(response.data.error || 'An error occurred during login. Please try again.');
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
