@@ -73,17 +73,19 @@ const FAQ = () => {
     ];
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
-            <div className="space-y-1 rounded-lg border border-gray-200">
+        <div className="max-w-4xl mx-auto p-4">
+            <div className="space-y-4 rounded-lg border border-gray-200 bg-white shadow-md">
                 {faqs.map((faq, index) => (
-                    <FAQItems
-                        key={index}
-                        question={faq.question}
-                        answer={faq.answer}
-                    />
+                    <div key={index} className="p-4 border-b last:border-b-0">
+                        <FAQItems
+                            question={faq.question}
+                            answer={faq.answer}
+                        />
+                    </div>
                 ))}
             </div>
         </div>
+
     );
 };
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { exerciseOptions } from "@/app/api/excercises/route";
+import { exerciseOptions } from "@/app/api/exercise/route";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";

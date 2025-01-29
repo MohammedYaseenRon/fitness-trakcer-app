@@ -1,42 +1,34 @@
-import { OpenAIStream, StreamingTextResponse } from "ai";
-import { Configuration, OpenAIApi } from "openai-edge";
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export const runtime = "edge"; // Ensures it runs on the Edge runtime
+const API_KEY = process.env.GOOGLE_API_KEY;
 
-// Configure OpenAI API
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  })
-);
+export async function POST(req: NextRequest) {
+  const { prompt } = await req.json();
 
-export async function POST(req: Request) {
+  if (!prompt) {
+    return NextResponse.json(
+      { error: 'Prompt is required' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const { messages } = await req.json();
+    const genAI = new GoogleGenerativeAI(API_KEY as string);
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-    if (!messages || !Array.isArray(messages)) {
-      return new Response(JSON.stringify({ error: "Invalid request payload" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
 
-    // Request streaming chat response from OpenAI
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      stream: true,
-      messages: messages.map((message) => ({
-        role: message.role,
-        content: message.content,
-      })),
-    });
-
-    return new StreamingTextResponse(OpenAIStream(response));
+    // Return the response
+    return NextResponse.json({ text });
   } catch (error) {
-    console.error("Error in chat API:", error);
-    return new Response(JSON.stringify({ error: "Server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error('Error from Gemini API:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate text' },
+      { status: 500 }
+    );
   }
 }

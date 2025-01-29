@@ -19,8 +19,8 @@ export const ServiceInfo = () => {
     {
       id: 3,
       image: "/Assets/health.png",
-      text: "Weekly Challenges",
-      desc: "Our Weekly Challenges feature is designed to motivate and inspire you to push your limits and achieve your fitness goals. Each week, you'll have the opportunity to participate in exciting challenges that not only enhance your physical capabilities but also foster a sense of community and friendly competition."
+      text: "Create your workout Plan",
+      desc: "Our workout plan feature is designed to motivate and inspire you to push your limits and achieve your fitness goals. Each week, you'll have the opportunity to participate in exciting challenges that not only enhance your physical capabilities but also foster a sense of community and friendly competition."
     },
     {
       id: 4,
@@ -30,18 +30,12 @@ export const ServiceInfo = () => {
     },
     {
       id: 5,
-      image: "/Assets/one.png",
-      text: "Personal Reminder",
-      desc: "Fit4You provides you to create, manage, and receive reminders in real-time, ensuring you never miss an important task or event with real-time notification Remainder"
-    },
-    {
-      id: 6,
       image: "/Assets/health.png",
       text: "Goal Setting",
       desc: "Fit4You helps to set, track, and accomplish your goals effectively while keeping yourself motivated along the way."
     },
     {
-      id: 7,
+      id: 6,
       image: "/Assets/one.png",
       text: "One to One Monitoring",
       desc: "Our One-to-One Mentoring Sessions leverage WebSocket technology to provide real-time, interactive communication between mentors and mentees. Enjoy personalized guidance and instant feedback in a secure environment, ensuring a rich and engaging learning experience."

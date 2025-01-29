@@ -7,6 +7,8 @@ import { Textarea } from "./ui/textarea";
 import axios from "axios";
 import { title } from "process";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+
 
 
 
@@ -33,6 +35,7 @@ interface ModalProps {
 export default function WorkoutCards({
   isOpen, onClose, name, className
 }: ModalProps) {
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
   const [isBookMarked, setIsBookMarked] = useState(false);
@@ -57,7 +60,7 @@ export default function WorkoutCards({
     e.preventDefault();
 
     try {
-      const userId = 1;
+      const userId = session?.user.id;
       const response = await axios.post("api/workout", {
         ...formData, userId,
       })

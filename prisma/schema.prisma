@@ -14,26 +14,56 @@ datasource db {
 }
 
 model User {
-  id            Int               @id @default(autoincrement())
-  name          String            @unique
-  email         String            @unique
-  password      String
-  weight        Float?
-  height        Float?
-  age           Int?
-  dailyCalories Int?              @default(2000)
-  fitnessGoal   String?           @default("MAINTAIN")
-  activityLevel String?           @default("MODERATE")
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  schedules     Schedule[]
-  activities    FitnessActivity[]
-  progress      ProgressRecord[]
-  workout       Workout[]
-  bookmark      Bookmark[]
+  id                 Int               @id @default(autoincrement())
+  name               String            @unique
+  email              String            @unique
+  password           String
+  weight             Float?
+  height             Float?
+  age                Int?
+  dailyCalories      Int?              @default(2000)
+  fitnessGoal        String?           @default("MAINTAIN")
+  activityLevel      String?           @default("MODERATE")
+  dietaryPreferences String[]
+  allergies          String[]
+  weightGoal         String?
+  numberOfMeals      Int?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  schedules          Schedule[]
+  progress           ProgressRecord[]
+  workout            Workout[]
+  bookmark           Bookmark[]
+  nutrition          NutritionLog[]
+  mealsuggestion     MealSuggestion[]
+  exercise           Exercise[]
 }
 
-model chatMessage{
+model NutritionLog {
+  id       Int      @id @default(autoincrement())
+  date     DateTime
+  calories Int
+  protein  Int
+  carbs    Int
+  fat      Int
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model MealSuggestion {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  name        String
+  description String
+  calories    Int
+  protein     Int
+  carbs       Int
+  fat         Int
+  imageUrl    String?
+  user        User    @relation(fields: [userId], references: [id])
+}
+
+model chatMessage {
   id        String   @id @default(cuid())
   role      String
   content   String
@@ -51,19 +81,20 @@ model Workout {
   userId      Int
   User        User       @relation(fields: [userId], references: [id])
   bookmark    Bookmark[]
-  exercise    Exercise[]
   date        DateTime   @default(now())
 }
 
 model Exercise {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   sets      Int?
   reps      Int?
   weight    Float?
   calories  Float?
-  workoutId Int
-  workout   Workout @relation(fields: [workoutId], references: [id])
+  duration  String   @default("00:00") 
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now()) // Ensure you have a date field to track when the exercise was logged
 }
 
 model Bookmark {
@@ -98,19 +129,5 @@ model Schedule {
   duration Int
 }
 
-model FitnessActivity {
-  id       Int      @id @default(autoincrement())
-  userId   Int
-  date     DateTime
-  user     User     @relation(fields: [userId], references: [id])
-  calories Int
-  steps    Int
-}
 
-model Equipment {
-  id      Int    @id @default(autoincrement())
-  name    String
-  stock   Int
-  discount Float
-  price   Float
-}
+

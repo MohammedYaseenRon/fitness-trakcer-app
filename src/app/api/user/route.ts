@@ -12,13 +12,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {
-      return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
-      );
+        return NextResponse.json(
+            { message: 'Unauthorized' },
+            { status: 401 }
+        );
     }
     try {
-        const { weight, height, age, fitnessGoal, activityLevel, dailyCalories } = await req.json();
+        const { weight, height, age, fitnessGoal, activityLevel, dailyCalories, dietaryPreferences, allergies, weightGoal, numberOfMeals,
+        } = await req.json();
 
         const user = await prisma.user.findUnique({
             where: {
@@ -37,6 +38,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 fitnessGoal,
                 activityLevel,
                 dailyCalories: parseInt(dailyCalories),
+                dietaryPreferences, // Expecting an array
+                allergies, // Expecting an array
+                weightGoal,
+                numberOfMeals: numberOfMeals ? parseInt(numberOfMeals) : null,
             },
         });
         return NextResponse.json(
@@ -53,32 +58,32 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 }
 
-export async function GET(req:NextRequest) {
-    try{
+export async function GET(req: NextRequest) {
+    try {
         const session = await getServerSession(authOptions);
-        if(!session || !session.user?.email) {
+        if (!session || !session.user?.email) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
         }
         const user = await prisma.user.findUnique({
-            where:{
-                email:session.user.email
+            where: {
+                email: session.user.email
             }
         });
-        if(!user){
+        if (!user) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
         }
         return NextResponse.json(
             {
-              success: true,
-              message: 'Content fetched successfully',
-              data: user
+                success: true,
+                message: 'Content fetched successfully',
+                data: user
             },
             { status: 200 }
-          );
-    }catch(error) {
+        );
+    } catch (error) {
         console.error("Error while fetching user details:", error);
-        return NextResponse.json({success:false,error:"Internal server error"},{status:500})
+        return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
     }
 }

@@ -26,6 +26,10 @@ interface Details {
     fitnessGoal: FitnessGoal;
     activityLevel: ActivityLevel;
     dailyCalories: number;
+    dietaryPreferences: string[],
+    allergies: string[]
+    weightGoal: string | null;
+    numberOfMeals: number | null;
 }
 
 const UserDetailsForm = () => {
@@ -39,6 +43,11 @@ const UserDetailsForm = () => {
         fitnessGoal: "MAINTAIN",
         activityLevel: "MODERATE",
         dailyCalories: 2000,
+        dietaryPreferences: [] as string[],
+        allergies: [] as string[],
+        weightGoal: "",
+        numberOfMeals: null as number | null
+
     });
 
     const [step, setStep] = useState(1);
@@ -60,14 +69,16 @@ const UserDetailsForm = () => {
         });
     };
 
+
+
     const validateCurrentStep = () => {
         switch (step) {
             case 1:
-                return formData.weight && formData.height && formData.age;
+                return formData.weight && formData.height && formData.age && formData.weightGoal;
             case 2:
-                return formData.fitnessGoal && formData.activityLevel;
+                return formData.fitnessGoal && formData.activityLevel && formData.numberOfMeals !== null && formData.dietaryPreferences;
             case 3:
-                return formData.dailyCalories > 0;
+                return formData.dailyCalories > 0 && formData.allergies.length >= 0
             default:
                 return false;
         }
@@ -80,7 +91,7 @@ const UserDetailsForm = () => {
                     const response = await axios.post("/api/user", {
                         ...formData,
                     });
-
+                    console.log(response.data);
                     if (response.status === 201) {
                         setFormData({
                             weight: "",
@@ -89,6 +100,12 @@ const UserDetailsForm = () => {
                             fitnessGoal: "MAINTAIN",
                             activityLevel: "MODERATE",
                             dailyCalories: 2000,
+                            dietaryPreferences: [],
+                            allergies: [],
+                            weightGoal: "",
+                            numberOfMeals: null
+
+
                         });
                         toast.success("User details updated successfully!");
                         router.push("/dashboard");
@@ -110,11 +127,12 @@ const UserDetailsForm = () => {
 
     return (
         <div className="min-h-screen w-full flex">
-            <div className="flex items-center lg:w-[calc(100vw-600px)] xl:w-[calc(100vw-720px)] w-full px-16 py-8">
-                <Card className="w-[600px] shadow-lg">
+            <div className="flex items-center lg:w-[calc(100vw-600px)] xl:w-[calc(100vw-720px)] w-full px-24 py-8 bg-amber-50
+">
+                <Card className="w-[600px]">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-center">
-                            {step === 1 && "Basic Information"}
+                            {step === 1 && "Basic Information of Your's"}
                             {step === 2 && "Fitness Profile"}
                             {step === 3 && "Daily Goals"}
                         </CardTitle>
@@ -171,6 +189,20 @@ const UserDetailsForm = () => {
                                             required
                                         />
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="weightGoal" className="text-sm font-medium">
+                                            Target Weight (kg)
+                                        </Label>
+                                        <Input
+                                            id="weightGoal"
+                                            name="weightGoal"
+                                            type="number"
+                                            placeholder="Enter your target weight"
+                                            className="h-11"
+                                            value={formData.weightGoal}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
                                 </div>
                             )}
 
@@ -213,6 +245,42 @@ const UserDetailsForm = () => {
                                             </SelectContent>
                                         </Select>
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="numberOfMeals" className="text-sm font-medium">
+                                            Preferred Number of Meals per Day
+                                        </Label>
+                                        <Input
+                                            id="numberOfMeals"
+                                            name="numberOfMeals"
+                                            type="number"
+                                            placeholder="Enter number of meals"
+                                            className="h-11"
+                                            value={formData.numberOfMeals || ''}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="dietaryPreferences" className="text-sm font-medium">
+                                            Dietary Preferences
+                                        </Label>
+                                        <Input
+                                            id="dietaryPreferences"
+                                            name="dietaryPreferences"
+                                            placeholder="Enter preferences (comma-separated)"
+                                            className="h-11"
+                                            value={formData.dietaryPreferences.join(', ')}
+                                            onChange={(e) => {
+                                                const preferences = e.target.value
+                                                    .split(',')
+                                                    .map(pref => pref.trim())
+                                                    .filter(pref => pref !== '');
+                                                setFormData({
+                                                    ...formData,
+                                                    dietaryPreferences: preferences
+                                                });
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             )}
 
@@ -233,6 +301,30 @@ const UserDetailsForm = () => {
                                             required
                                         />
                                     </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="allergies" className="text-sm font-medium">
+                                            Food Allergies
+                                        </Label>
+                                        <Input
+                                            id="allergies"
+                                            name="allergies"
+                                            placeholder="Enter allergies (comma-separated)"
+                                            className="h-11"
+                                            value={formData.allergies.join(', ')}
+                                            onChange={(e) => {
+                                                const allergiesList = e.target.value
+                                                    .split(',')
+                                                    .map(allergy => allergy.trim())
+                                                    .filter(allergy => allergy !== '');
+                                                setFormData({
+                                                    ...formData,
+                                                    allergies: allergiesList
+                                                });
+                                            }}
+                                        />
+                                    </div>
+
                                 </div>
                             )}
 
@@ -248,9 +340,9 @@ const UserDetailsForm = () => {
                                     </Button>
                                 )}
                                 {step === 1 && <div className="w-28" />}
-                                <Button 
-                                    type="button" 
-                                    onClick={handleNext} 
+                                <Button
+                                    type="button"
+                                    onClick={handleNext}
                                     className="w-28"
                                 >
                                     {step === totalSteps ? "Submit" : "Next"}
@@ -261,9 +353,9 @@ const UserDetailsForm = () => {
                 </Card>
             </div>
 
-            <div className="relative hidden lg:block w-[600px] xl:w-[720px]">
+            <div className="relative hidden lg:block w-[700px] xl:w-[900px]">
                 <img
-                    src="/api/placeholder/600/1080"
+                    src="Assets/healthImage.png"
                     alt="sign up"
                     className="h-screen w-full object-cover"
                 />

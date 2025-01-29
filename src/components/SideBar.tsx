@@ -1,7 +1,7 @@
 "use client";
 
-import React,{useState} from "react";
-import { useRouter,usePathname } from "next/navigation"
+import React, { useState } from "react";
+import { usePathname } from "next/navigation"
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -33,47 +33,61 @@ import {
     Umbrella,
     Mail,
     Dumbbell,
-  } from "lucide-react";
-  import Link from "next/link";
+    User2,
+} from "lucide-react";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-  interface UserData {
+interface UserData {
     id: string;
     email: string;
     user_type: string;
     name?: string;
     user_name?: string;
-  }
+}
 
 
 export const SideBar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [notifications, setNotifications] = useState(0); // Mock notification count
-    const [userData,setUserData] = useState<UserData | null>(null)
-    const router = useRouter();
+    const [userData, setUserData] = useState<UserData | null>(null)
     const pathname = usePathname();
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    if (status === "loading") {
+        return <p>Loading...</p>;
+    }
+
+    if (!session) {
+        router.push("/login");
+        return null;
+    }
+
+    const handleSignOut = async () => {
+        await signOut({ redirect: true, callbackUrl: "/" }); // Redirect to home page after sign-out
+
+    }
 
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: Building2 },
         {
-          href: "/workout",
-          label: "Workout",
-          icon: ShieldCheck,
+            href: "/workout",
+            label: "Workout",
+            icon: ShieldCheck,
         },
         {
             href: "/progress",
             label: "Progress",
             icon: ShieldCheck,
-          },
+        },
         { href: "/nutrition", label: "Nutrition", icon: BriefcaseBusiness },
-        { href: "/excercises", label: "Excercises", icon: Dumbbell },
-        { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
+        // { href: "/excercises", label: "Excercises", icon: Dumbbell },
+        // { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
         { href: "/goal", label: "Goal setting", icon: UserCircle },
     ]
 
-      const handleSignOut = (e:React.FormEvent) => {
-        e.preventDefault();
-        console.log("form submitted");
-      }
 
     return (
         <div
@@ -113,8 +127,8 @@ export const SideBar = () => {
                                         <Link
                                             href={item.href}
                                             className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition-colors ${isActive
-                                                    ? "bg-[#e8efed] text-[#1b5445] font-extrabold"
-                                                    : "text-gray-600 hover:bg-gray-50"
+                                                ? "bg-[#e8efed] text-[#1b5445] font-extrabold"
+                                                : "text-gray-600 hover:bg-gray-50"
                                                 }`}
                                         >
                                             <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -139,27 +153,20 @@ export const SideBar = () => {
                         >
                             <Avatar className="h-8 w-8 mr-2">
                                 <AvatarFallback className="bg-[#1b5445] text-white">
-                                    {/* {userData.email.charAt(0).toUpperCase()} */}
+                                    <User2 />
                                 </AvatarFallback>
                             </Avatar>
                             {!isCollapsed && (
                                 <div className="flex flex-col items-start">
-                                    <span className="text-sm font-medium">
-                                        {/* {userData.user_name || "User"} */}
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {/* Displaying name dynamically from session */}
+                                        <p>Name: {session.user?.name}</p>
                                     </span>
                                     <span className="text-xs text-gray-500">
-                                        {/* {userData.email} */}
+                                        <p className="text-gray-700">Email: {session.user?.email}</p>
                                     </span>
                                 </div>
                             )}
-                            {/* {notifications > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1"
-                    >
-                      {notifications}
-                    </Badge>
-                  )} */}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -167,26 +174,18 @@ export const SideBar = () => {
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>
                         </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>App Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Bell className="mr-2 h-4 w-4" />
-                  <span>Notifications</span>
-                  {notifications > 0 && (
-                    <Badge variant="destructive" className="ml-auto">
-                      {notifications}
-                    </Badge>
-                  )}
-                </DropdownMenuItem> */}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSignOut}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Sign out</span>
+                            {/* Sign out button styled */}
+                            <button
+                                className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            >
+                                Sign Out
+                            </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
             </div>
         </div>
     );
