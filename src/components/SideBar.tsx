@@ -101,7 +101,7 @@ export const SideBar = () => {
         },
         { href: "/nutrition", label: "Nutrition", icon: BriefcaseBusiness },
         // { href: "/excercises", label: "Excercises", icon: Dumbbell },
-        // { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
+        { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
         { href: "/goal", label: "Goal setting", icon: UserCircle },
     ]
 
