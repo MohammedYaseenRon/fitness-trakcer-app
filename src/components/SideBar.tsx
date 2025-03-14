@@ -34,7 +34,8 @@ import {
     Mail,
     Dumbbell,
     User2,
-    Menu
+    Menu,
+    Train
 } from "lucide-react";
 import {
     Sheet,
@@ -102,7 +103,8 @@ export const SideBar = () => {
         { href: "/nutrition", label: "Nutrition", icon: BriefcaseBusiness },
         // { href: "/excercises", label: "Excercises", icon: Dumbbell },
         { href: "/diet", label: "Diet", icon: BriefcaseBusiness },
-        { href: "/goal", label: "Goal setting", icon: UserCircle },
+        { href: "/train", label: "Train", icon: Train },
+        // { href: "/goal", label: "Goal setting", icon: UserCircle },
     ]
 
     if (isMobile) {

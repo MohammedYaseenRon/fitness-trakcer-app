@@ -14,22 +14,22 @@ datasource db {
 }
 
 model User {
-  id                 Int               @id @default(autoincrement())
-  name               String            @unique
-  email              String            @unique
+  id                 Int              @id @default(autoincrement())
+  name               String           @unique
+  email              String           @unique
   password           String
   weight             Float?
   height             Float?
   age                Int?
-  dailyCalories      Int?              @default(2000)
-  fitnessGoal        String?           @default("MAINTAIN")
-  activityLevel      String?           @default("MODERATE")
+  dailyCalories      Int?             @default(2000)
+  fitnessGoal        String?          @default("MAINTAIN")
+  activityLevel      String?          @default("MODERATE")
   dietaryPreferences String[]
   allergies          String[]
   weightGoal         String?
   numberOfMeals      Int?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
   schedules          Schedule[]
   progress           ProgressRecord[]
   workout            Workout[]
@@ -71,30 +71,34 @@ model chatMessage {
 }
 
 model Workout {
-  id          Int        @id @default(autoincrement())
-  title       String
-  description String
-  duration    String
-  difficulty  String
-  goals       String
-  body        String
-  userId      Int
-  User        User       @relation(fields: [userId], references: [id])
-  bookmark    Bookmark[]
-  date        DateTime   @default(now())
+  id             Int        @id @default(autoincrement())
+  title          String
+  description    String
+  duration       String
+  difficulty     String
+  goals          String
+  body           String
+  userId         Int
+  User           User       @relation(fields: [userId], references: [id])
+  bookmark       Bookmark[]
+  date           DateTime   @default(now())
+  startTimeStamp DateTime   @default(now())
+  endTimeStamp   DateTime   @default(now()) 
+  timeSpent      Int        @default(0) 
+  reps           Int        @default(0) 
 }
 
 model Exercise {
-  id        Int      @id @default(autoincrement())
-  name      String
-  sets      Int?
-  reps      Int?
-  weight    Float?
-  calories  Float?
-  duration  String   @default("00:00") 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  date      DateTime @default(now()) // Ensure you have a date field to track when the exercise was logged
+  id       Int      @id @default(autoincrement())
+  name     String
+  sets     Int?
+  reps     Int?
+  weight   Float?
+  calories Float?
+  duration String   @default("00:00")
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  date     DateTime @default(now()) // Ensure you have a date field to track when the exercise was logged
 }
 
 model Bookmark {
@@ -128,6 +132,3 @@ model Schedule {
   activity String
   duration Int
 }
-
-
-
