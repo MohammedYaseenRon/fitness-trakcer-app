@@ -1,11 +1,14 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+
 interface BMIGaugeProps {
   userData: {
     data: {
-      weight: number;
-      height: number;
+      user:{
+        weight: number;
+        height: number;
+      }
     }
   } | null;
 }
@@ -29,7 +32,8 @@ const BMIGauge: React.FC<BMIGaugeProps> = ({ userData }) => {
   // If no user data, return null
   if (!userData) return null;
 
-  const bmi = calculateBMI(userData.data.weight, userData.data.height);
+  
+  const bmi = calculateBMI(userData.data.user.weight, userData.data.user.height);
   const { category, color } = getBMICategory(bmi);
 
   // Calculate rotation angle for the needle (180 degrees represents the full gauge)
@@ -62,10 +66,10 @@ const BMIGauge: React.FC<BMIGaugeProps> = ({ userData }) => {
           </div>
 
           {/* Needle */}
-          <div 
+          <div
             className="absolute bottom-0 left-1/2 w-1 h-32 bg-black origin-bottom transform transition-transform duration-500"
-            style={{ 
-              transform: `translateX(-50%) rotate(-${90 - needleRotation}deg)` 
+            style={{
+              transform: `translateX(-50%) rotate(-${90 - needleRotation}deg)`
             }}
           />
         </div>
@@ -79,13 +83,13 @@ const BMIGauge: React.FC<BMIGaugeProps> = ({ userData }) => {
             Category: {category}
           </p>
           <div className="text-sm text-gray-600 mt-2">
-            {category === 'Underweight' && 
+            {category === 'Underweight' &&
               "Consider consulting a nutritionist to develop a healthy weight gain plan."}
-            {category === 'Normal weight' && 
+            {category === 'Normal weight' &&
               "Great job maintaining a healthy weight! Continue balanced diet and exercise."}
-            {category === 'Overweight' && 
+            {category === 'Overweight' &&
               "Focus on balanced nutrition and increased physical activity."}
-            {category === 'Obese' && 
+            {category === 'Obese' &&
               "Consult healthcare professionals for a comprehensive health and weight management strategy."}
           </div>
         </div>

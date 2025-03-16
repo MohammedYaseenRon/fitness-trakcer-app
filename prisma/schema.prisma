@@ -14,29 +14,48 @@ datasource db {
 }
 
 model User {
-  id                 Int              @id @default(autoincrement())
-  name               String           @unique
-  email              String           @unique
-  password           String
-  weight             Float?
-  height             Float?
-  age                Int?
-  dailyCalories      Int?             @default(2000)
-  fitnessGoal        String?          @default("MAINTAIN")
-  activityLevel      String?          @default("MODERATE")
-  dietaryPreferences String[]
-  allergies          String[]
-  weightGoal         String?
-  numberOfMeals      Int?
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-  schedules          Schedule[]
-  progress           ProgressRecord[]
-  workout            Workout[]
-  bookmark           Bookmark[]
-  nutrition          NutritionLog[]
-  mealsuggestion     MealSuggestion[]
-  exercise           Exercise[]
+  id                   Int              @id @default(autoincrement())
+  name                 String           @unique
+  email                String           @unique
+  password             String
+  weight               Float?
+  height               Float?
+  age                  Int?
+  gender               String?
+  dailyCalories        Int?             @default(2000)
+  fitnessGoal          String?          @default("MAINTAIN")
+  activityLevel        String?          @default("MODERATE")
+  workoutDaysPerWeek   Int?             @default(4) // Number of workout days per week
+  workoutDuration      Int?             @default(30) // Workout time per session in minutes
+  workoutLocation      String?          @default("HOME") // "HOME", "GYM", "OUTDOOR"
+  availableEquipment   String[] // Equipment available to the user
+  dietaryPreferences   String[]
+  allergies            String[]
+  weightGoal           String?
+  numberOfMeals        Int?
+  injuryHistory        String?
+  mobilityIssues       String? // Flexibility or mobility limitations
+  preferredWorkoutTime String? // "MORNING", "AFTERNOON", "EVENING"
+  sleepHours           Int? // Number of hours of sleep per night
+  hydrationLevel       Int? // Average water intake in liters
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  schedules            Schedule[]
+  progress             ProgressRecord[]
+  workout              Workout[]
+  bookmark             Bookmark[]
+  nutrition            NutritionLog[]
+  mealsuggestion       MealSuggestion[]
+  exercise             Exercise[]
+  workoutPlan          WorkoutPlan[]
+}
+
+model WorkoutPlan {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  plan   Json
+  createdAt DateTime @default(now())
 }
 
 model NutritionLog {
@@ -83,9 +102,9 @@ model Workout {
   bookmark       Bookmark[]
   date           DateTime   @default(now())
   startTimeStamp DateTime   @default(now())
-  endTimeStamp   DateTime   @default(now()) 
-  timeSpent      Int        @default(0) 
-  reps           Int        @default(0) 
+  endTimeStamp   DateTime   @default(now())
+  timeSpent      Int        @default(0)
+  reps           Int        @default(0)
 }
 
 model Exercise {

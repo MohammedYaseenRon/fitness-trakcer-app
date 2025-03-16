@@ -118,12 +118,7 @@ export const SideBar = () => {
                 <SheetContent side="left" className="w-64">
                     <div className="flex flex-col h-full">
                         <div className="flex items-center justify-center p-6">
-                            <Image
-                                src="/logo.svg"
-                                alt="COVERFi Logo"
-                                width={150}
-                                height={40}
-                            />
+                            <h3 className="text-3xl font-semibold text-blue-600">Fit 4 <span>You</span></h3>
                         </div>
 
                         <nav className="space-y-1 px-3 flex-grow">
@@ -195,25 +190,7 @@ export const SideBar = () => {
         >
             <div>
                 <div className="flex items-center justify-between p-6">
-                    {!isCollapsed && (
-                        <Image
-                            src="/logo.svg"
-                            alt="COVERFi Logo"
-                            width={150}
-                            height={40}
-                            className="h-full"
-                        />
-                    )}
-                    {isCollapsed && (
-                        <Image
-                            onClick={() => setIsCollapsed(!isCollapsed)}
-                            src="/logo-sm.svg"
-                            alt="COVERFi Logo"
-                            width={150}
-                            height={40}
-                            className="h-full lg:hidden"
-                        />
-                    )}
+                <h3 className="text-2xl font-semibold text-blue-600">Fit 4 <span className="text-gray-400">You</span></h3>
                 </div>
 
                 <nav className="space-y-1 px-3">

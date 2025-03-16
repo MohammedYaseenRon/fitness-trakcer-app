@@ -23,23 +23,33 @@ interface Details {
     weight: string;
     height: string;
     age: string;
+    gender:string,
     fitnessGoal: FitnessGoal;
     activityLevel: ActivityLevel;
     dailyCalories: number;
     dietaryPreferences: string[],
     allergies: string[]
-    weightGoal: string | null;
+    weightGoal: string
     numberOfMeals: number | null;
+    workoutDaysPerWeek:number,
+    workoutDuration:number,
+    workoutLocation:string,
+    availableEquipment:string[]
 }
 
 const UserDetailsForm = () => {
     const router = useRouter();
 
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<Details>({
         weight: "",
         height: "",
         age: "",
+        gender:"",
+        workoutDaysPerWeek:4,
+        workoutDuration:30,
+        workoutLocation:"Home",  
+        availableEquipment:[] as string[],
         fitnessGoal: "MAINTAIN",
         activityLevel: "MODERATE",
         dailyCalories: 2000,
@@ -62,7 +72,7 @@ const UserDetailsForm = () => {
         });
     };
 
-    const handleSelectChange = (name: "fitnessGoal" | "activityLevel", value: string) => {
+    const handleSelectChange = (name: "fitnessGoal" | "activityLevel" | "gender" | "workoutLocation", value: string) => {
         setFormData({
             ...formData,
             [name]: value,
@@ -74,11 +84,11 @@ const UserDetailsForm = () => {
     const validateCurrentStep = () => {
         switch (step) {
             case 1:
-                return formData.weight && formData.height && formData.age && formData.weightGoal;
+                return formData.weight && formData.height && formData.gender &&  formData.age && formData.weightGoal;
             case 2:
-                return formData.fitnessGoal && formData.activityLevel && formData.numberOfMeals !== null && formData.dietaryPreferences;
+                return formData.fitnessGoal && formData.activityLevel && formData.numberOfMeals !== null && formData.dietaryPreferences && formData.workoutDaysPerWeek;
             case 3:
-                return formData.dailyCalories > 0 && formData.allergies.length >= 0
+                return formData.dailyCalories > 0 && formData.allergies.length >= 0 && formData.workoutDuration >=0 && formData.workoutLocation && formData.availableEquipment
             default:
                 return false;
         }
@@ -97,6 +107,11 @@ const UserDetailsForm = () => {
                             weight: "",
                             height: "",
                             age: "",
+                            gender:"",
+                            workoutDaysPerWeek:4,
+                            workoutDuration:30,
+                            workoutLocation:"",
+                            availableEquipment:[],
                             fitnessGoal: "MAINTAIN",
                             activityLevel: "MODERATE",
                             dailyCalories: 2000,
@@ -190,6 +205,24 @@ const UserDetailsForm = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label htmlFor="gender" className="text-sm font-medium">
+                                            Gender
+                                        </Label>
+                                        <Select
+                                            value={formData.gender}
+                                            onValueChange={(value) => handleSelectChange("gender", value)}
+                                        >
+                                            <SelectTrigger className="h-11">
+                                                <SelectValue placeholder="Select your Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="LOSE">Male</SelectItem>
+                                                <SelectItem value="GAIN">Female</SelectItem>
+                                                {/* <SelectItem value="MAINTAIN">Maintain Weight</SelectItem> */}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="weightGoal" className="text-sm font-medium">
                                             Target Weight (kg)
                                         </Label>
@@ -260,6 +293,20 @@ const UserDetailsForm = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label htmlFor="numberOfMeals" className="text-sm font-medium">
+                                            Workout Days PerWeek
+                                        </Label>
+                                        <Input
+                                            id="workoutDaysPerWeek"
+                                            name="workoutDaysPerWeek"
+                                            type="number"
+                                            placeholder="Enter number workoutDaysPerWeek"
+                                            className="h-11"
+                                            value={formData.workoutDaysPerWeek}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="dietaryPreferences" className="text-sm font-medium">
                                             Dietary Preferences
                                         </Label>
@@ -299,6 +346,62 @@ const UserDetailsForm = () => {
                                             value={formData.dailyCalories}
                                             onChange={handleChange}
                                             required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="dailyCalories" className="text-sm font-medium">
+                                           Workout Duration
+                                        </Label>
+                                        <Input
+                                            id="workoutDuration"
+                                            name="workoutDuration"
+                                            type="number"
+                                            placeholder="Enter your workout duration of daily"
+                                            className="h-11"
+                                            value={formData.workoutDuration}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="workoutLocation" className="text-sm font-medium">
+                                            Workout Location
+                                        </Label>
+                                        <Select
+                                            value={formData.workoutLocation}
+                                            onValueChange={(value) => handleSelectChange("workoutLocation", value)}
+                                        >
+                                            <SelectTrigger className="h-11">
+                                                <SelectValue placeholder="Select your Location of the workout" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="HOME">Home</SelectItem>
+                                                <SelectItem value="GYM">Gym</SelectItem>
+                                                <SelectItem value="OUTDOOR">Outdoor</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="availableEquipment" className="text-sm font-medium">
+                                           Available Equipments
+                                        </Label>
+                                        <Input
+                                            id="availableEquipment"
+                                            name="availableEquipment"
+                                            placeholder="Enter your available Equipments"
+                                            className="h-11"
+                                            value={formData.availableEquipment.join(', ')}
+                                            onChange={(e) => {
+                                                const equipment = e.target.value
+                                                    .split(',')
+                                                    .map(equipment => equipment.trim())
+                                                    .filter(equipment => equipment !== '');
+                                                setFormData({
+                                                    ...formData,
+                                                    availableEquipment: equipment
+                                                });
+                                            }}
                                         />
                                     </div>
 

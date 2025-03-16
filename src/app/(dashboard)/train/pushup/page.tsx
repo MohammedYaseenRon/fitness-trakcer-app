@@ -48,7 +48,7 @@ const angleBetweenThreePoints = (points: Point[]): number => {
   return Math.abs((angle * 180) / Math.PI);
 };
 
-const BicepCurls: React.FC = () => {
+const PushUPs: React.FC = () => {
   
 
   const webcamRef: RefObject<WebcamWithVideo> = useRef(null);
@@ -371,4 +371,4 @@ const BicepCurls: React.FC = () => {
   );
 };
 
-export default BicepCurls;
+export default PushUPs;
