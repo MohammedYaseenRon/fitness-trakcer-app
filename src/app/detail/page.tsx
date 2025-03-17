@@ -84,9 +84,9 @@ const UserDetailsForm = () => {
     const validateCurrentStep = () => {
         switch (step) {
             case 1:
-                return formData.weight && formData.height && formData.gender &&  formData.age && formData.weightGoal;
+                return formData.weight && formData.height && formData.gender &&  formData.age;
             case 2:
-                return formData.fitnessGoal && formData.activityLevel && formData.numberOfMeals !== null && formData.dietaryPreferences && formData.workoutDaysPerWeek;
+                return formData.fitnessGoal && formData.activityLevel && formData.numberOfMeals !== null && formData.dietaryPreferences;
             case 3:
                 return formData.dailyCalories > 0 && formData.allergies.length >= 0 && formData.workoutDuration >=0 && formData.workoutLocation && formData.availableEquipment
             default:
@@ -216,13 +216,13 @@ const UserDetailsForm = () => {
                                                 <SelectValue placeholder="Select your Gender" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="LOSE">Male</SelectItem>
-                                                <SelectItem value="GAIN">Female</SelectItem>
+                                                <SelectItem value="MALE">Male</SelectItem>
+                                                <SelectItem value="FEMALE">Female</SelectItem>
                                                 {/* <SelectItem value="MAINTAIN">Maintain Weight</SelectItem> */}
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    <div className="space-y-2">
+                                    {/* <div className="space-y-2">
                                         <Label htmlFor="weightGoal" className="text-sm font-medium">
                                             Target Weight (kg)
                                         </Label>
@@ -235,7 +235,7 @@ const UserDetailsForm = () => {
                                             value={formData.weightGoal}
                                             onChange={handleChange}
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
                             )}
 
@@ -254,7 +254,7 @@ const UserDetailsForm = () => {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="LOSE">Lose Weight</SelectItem>
-                                                <SelectItem value="GAIN">Gain Muscle</SelectItem>
+                                                <SelectItem value="GAIN">Gain Weiight</SelectItem>
                                                 <SelectItem value="MAINTAIN">Maintain Weight</SelectItem>
                                             </SelectContent>
                                         </Select>
@@ -292,7 +292,7 @@ const UserDetailsForm = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="space-y-2">
+                                    {/* <div className="space-y-2">
                                         <Label htmlFor="numberOfMeals" className="text-sm font-medium">
                                             Workout Days PerWeek
                                         </Label>
@@ -305,7 +305,7 @@ const UserDetailsForm = () => {
                                             value={formData.workoutDaysPerWeek}
                                             onChange={handleChange}
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="space-y-2">
                                         <Label htmlFor="dietaryPreferences" className="text-sm font-medium">
                                             Dietary Preferences
@@ -313,7 +313,7 @@ const UserDetailsForm = () => {
                                         <Input
                                             id="dietaryPreferences"
                                             name="dietaryPreferences"
-                                            placeholder="Enter preferences (comma-separated)"
+                                            placeholder="Enter preferences"
                                             className="h-11"
                                             value={formData.dietaryPreferences.join(', ')}
                                             onChange={(e) => {

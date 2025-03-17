@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Pose } from "@mediapipe/pose";
 import * as cam from "@mediapipe/camera_utils";
 import Webcam from "react-webcam";
@@ -12,164 +12,193 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "../../../../../firebase";
 import Cookies from "js-cookie";
 
+// Define types
 interface Point {
   x: number;
   y: number;
 }
 
-let count: number = 0;
-let dir: number = 0;
+interface PoseResults {
+  poseLandmarks?: {
+    x: number;
+    y: number;
+  }[];
+}
 
+let count: number = 0;
 const speech: SpeechSynthesis = window.speechSynthesis;
+
 const speak = (count: number): void => {
   const object: SpeechSynthesisUtterance = new SpeechSynthesisUtterance(count.toString());
   object.lang = "en-US";
-  speech.speak(object);
+  if (count === 0) {
+    const resetMessage = new SpeechSynthesisUtterance("Please Start Again");
+    resetMessage.lang = "en-US";
+    speech.speak(resetMessage);
+  } else {
+    speech.speak(object);
+  }
 };
-
-interface NormalizedLandmark {
-  x: number;
-  y: number;
-  z: number;
-  visibility?: number;
-}
-
-interface PoseResults {
-  poseLandmarks?: NormalizedLandmark[];
-}
-
-
 
 const BicepCurls: React.FC = () => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countTextbox = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<cam.Camera | null>(null);
+  const [isWebcamReady, setIsWebcamReady] = useState<boolean>(false); // Added for better initialization
+  let camera: cam.Camera | null = null;
+  let dir: number = 0; // 0 = waiting for down, 1 = waiting for up
 
   useEffect(() => {
     const startTime: Date = new Date();
     const startTimeSec: number = startTime.getSeconds();
     localStorage.setItem("bicepStartTime", startTimeSec.toString());
-    console.log("Start time:", startTime);
+    console.log(startTime);
   }, []);
 
-  const onResult = (results: PoseResults): void => {
-    if (results.poseLandmarks && canvasRef.current && webcamRef.current?.video) {
-      const canvas = canvasRef.current;
-      const video = webcamRef.current.video;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+  function onResult(results: PoseResults): void {
+    if (results.poseLandmarks) {
+      const position = results.poseLandmarks;
+      if (canvasRef.current && webcamRef.current?.video) {
+        canvasRef.current.width = webcamRef.current.video.videoWidth;
+        canvasRef.current.height = webcamRef.current.video.videoHeight;
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+        const width: number = canvasRef.current.width;
+        const height: number = canvasRef.current.height;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
+        const leftHand: Point[] = [];
+        const rightHand: Point[] = [];
+        const righthip: Point[] = [];
+        const lefthip: Point[] = [];
+        const hiparr: number[] = [11, 12, 23, 24, 25, 26];
 
-      const width = canvas.width;
-      const height = canvas.height;
-
-      const leftHand: Point[] = [];
-      const rightHand: Point[] = [];
-      const rightHip: Point[] = [];
-      const leftHip: Point[] = [];
-      const hipArr: number[] = [11, 12, 23, 24, 25, 26];
-
-      for (let i = 11; i < 17; i++) {
-        const point: Point = {
-          x: results.poseLandmarks[i].x * width,
-          y: results.poseLandmarks[i].y * height,
-        };
-        if (i % 2 === 0) rightHand.push(point);
-        else leftHand.push(point);
-      }
-
-      for (let i = 0; i < 6; i++) {
-        const idx = hipArr[i];
-        const point: Point = {
-          x: results.poseLandmarks[idx].x * width,
-          y: results.poseLandmarks[idx].y * height,
-        };
-        if (idx % 2 === 0) rightHip.push(point);
-        else leftHip.push(point);
-      }
-
-      const leftHandAngle = Math.round(angleBetweenThreePoints(leftHand));
-      const rightHandAngle = Math.round(angleBetweenThreePoints(rightHand));
-      const rightHipAngle = Math.round(angleBetweenThreePoints(rightHip));
-      const leftHipAngle = Math.round(angleBetweenThreePoints(leftHip));
-
-      const inRangeRightHand = rightHandAngle <= 20;
-      const inRangeLeftHand = leftHandAngle <= 20;
-      const inRangeRightHip = rightHipAngle >= 170 && rightHipAngle <= 180;
-      const inRangeLeftHip = leftHipAngle >= 170 && leftHipAngle <= 180;
-
-      ctx.lineWidth = 8;
-      for (let i = 0; i < 2; i++) {
-        ctx.beginPath();
-        ctx.moveTo(rightHand[i].x, rightHand[i].y);
-        ctx.lineTo(rightHand[i + 1].x, rightHand[i + 1].y);
-        ctx.strokeStyle = inRangeRightHand ? "green" : "red";
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(leftHand[i].x, leftHand[i].y);
-        ctx.lineTo(leftHand[i + 1].x, leftHand[i + 1].y);
-        ctx.strokeStyle = inRangeLeftHand ? "green" : "red";
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(rightHip[i].x, rightHip[i].y);
-        ctx.lineTo(rightHip[i + 1].x, rightHip[i + 1].y);
-        ctx.strokeStyle = inRangeRightHip ? "green" : "red";
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(leftHip[i].x, leftHip[i].y);
-        ctx.lineTo(leftHip[i + 1].x, leftHip[i + 1].y);
-        ctx.strokeStyle = inRangeLeftHip ? "green" : "red";
-        ctx.stroke();
-      }
-
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.arc(rightHand[i].x, rightHand[i].y, 8, 0, Math.PI * 2);
-        ctx.arc(leftHand[i].x, leftHand[i].y, 8, 0, Math.PI * 2);
-        ctx.arc(rightHip[i].x, rightHip[i].y, 8, 0, Math.PI * 2);
-        ctx.arc(leftHip[i].x, leftHip[i].y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = "#AAFF00";
-        ctx.fill();
-      }
-
-      if (inRangeLeftHand && inRangeRightHand && inRangeRightHip && inRangeLeftHip) {
-        if (dir === 0) {
-          count += 1;
-          speak(count);
-          dir = 1;
-          if (countTextbox.current) countTextbox.current.value = count.toString();
-          console.log("Count:", count);
+        for (let i = 11; i < 17; i++) {
+          const obj: Point = {
+            x: position[i].x * width,
+            y: position[i].y * height,
+          };
+          if (i % 2 === 0) {
+            rightHand.push(obj);
+          } else {
+            leftHand.push(obj);
+          }
         }
-      } else {
-        dir = 0;
+
+        for (let i = 0; i < 6; i++) {
+          const p: number = hiparr[i];
+          const obj: Point = {
+            x: position[p].x * width,
+            y: position[p].y * height,
+          };
+          if (p % 2 === 0) {
+            righthip.push(obj);
+          } else {
+            lefthip.push(obj);
+          }
+        }
+
+        const leftHandAngle: number = Math.round(angleBetweenThreePoints(leftHand));
+        const rightHandAngle: number = Math.round(angleBetweenThreePoints(rightHand));
+        const rightHipAngle: number = Math.round(angleBetweenThreePoints(righthip));
+        const leftHipAngle: number = Math.round(angleBetweenThreePoints(lefthip));
+
+        const canvasElement: HTMLCanvasElement = canvasRef.current;
+        const canvasCtx: CanvasRenderingContext2D | null = canvasElement.getContext("2d");
+
+        if (canvasCtx) {
+          canvasCtx.save();
+          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+          const inRangeRightHandUp: boolean = rightHandAngle <= 20; // Arm curled
+          const inRangeLeftHandUp: boolean = leftHandAngle <= 20; // Arm curled
+          const inRangeRightHandDown: boolean = rightHandAngle >= 90; // Arm extended
+          const inRangeLeftHandDown: boolean = leftHandAngle >= 90; // Arm extended
+          const inRangeRightHip: boolean = rightHipAngle >= 170 && rightHipAngle <= 180;
+          const inRangeLeftHip: boolean = leftHipAngle >= 170 && leftHipAngle <= 180;
+
+          // Draw lines
+          for (let i = 0; i < 2; i++) {
+            canvasCtx.beginPath();
+            canvasCtx.lineWidth = 8;
+
+            canvasCtx.moveTo(rightHand[i].x, rightHand[i].y);
+            canvasCtx.lineTo(rightHand[i + 1].x, rightHand[i + 1].y);
+            canvasCtx.strokeStyle = inRangeRightHandUp ? "green" : "red";
+            canvasCtx.stroke();
+
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(leftHand[i].x, leftHand[i].y);
+            canvasCtx.lineTo(leftHand[i + 1].x, leftHand[i + 1].y);
+            canvasCtx.strokeStyle = inRangeLeftHandUp ? "green" : "red";
+            canvasCtx.stroke();
+
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(righthip[i].x, righthip[i].y);
+            canvasCtx.lineTo(righthip[i + 1].x, righthip[i + 1].y);
+            canvasCtx.strokeStyle = inRangeRightHip ? "green" : "red";
+            canvasCtx.stroke();
+
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(lefthip[i].x, lefthip[i].y);
+            canvasCtx.lineTo(lefthip[i + 1].x, lefthip[i + 1].y);
+            canvasCtx.strokeStyle = inRangeLeftHip ? "green" : "red";
+            canvasCtx.stroke();
+          }
+
+          for (let i = 0; i < 3; i++) {
+            canvasCtx.beginPath();
+            canvasCtx.arc(rightHand[i].x, rightHand[i].y, 8, 0, Math.PI * 2);
+            canvasCtx.arc(leftHand[i].x, leftHand[i].y, 8, 0, Math.PI * 2);
+            canvasCtx.fillStyle = "#AAFF00";
+            canvasCtx.fill();
+
+            canvasCtx.beginPath();
+            canvasCtx.arc(righthip[i].x, righthip[i].y, 8, 0, Math.PI * 2);
+            canvasCtx.arc(lefthip[i].x, lefthip[i].y, 8, 0, Math.PI * 2);
+            canvasCtx.fillStyle = "#AAFF00";
+            canvasCtx.fill();
+          }
+
+          // Updated counting logic: Full cycle (down → up)
+          if (
+            inRangeLeftHandDown &&
+            inRangeRightHandDown &&
+            inRangeRightHip &&
+            inRangeLeftHip &&
+            dir === 0
+          ) {
+            dir = 1; // Arms extended, waiting for curl up
+          } else if (
+            inRangeLeftHandUp &&
+            inRangeRightHandUp &&
+            inRangeRightHip &&
+            inRangeLeftHip &&
+            dir === 1
+          ) {
+            count = count + 1;
+            speak(count);
+            dir = 0; // Arms curled, rep complete, reset to wait for down
+            console.log("Count:", count);
+          }
+
+          canvasCtx.font = "30px aerial";
+          canvasCtx.fillText(`${leftHandAngle}`, leftHand[1].x + 20, leftHand[1].y + 20);
+          canvasCtx.fillText(`${rightHandAngle}`, rightHand[1].x - 120, rightHand[1].y + 20);
+          canvasCtx.fillText(`${leftHipAngle}`, lefthip[1].x + 20, lefthip[1].y + 20);
+          canvasCtx.fillText(`${leftHipAngle}`, lefthip[1].x - 120, lefthip[1].y + 20);
+
+          canvasCtx.restore();
+        }
       }
-
-      ctx.font = "30px Arial";
-      ctx.fillStyle = "white";
-      ctx.fillText(`${leftHandAngle}`, leftHand[1].x + 20, leftHand[1].y + 20);
-      ctx.fillText(`${rightHandAngle}`, rightHand[1].x - 120, rightHand[1].y + 20);
-      ctx.fillText(`${leftHipAngle}`, leftHip[1].x + 20, leftHip[1].y + 20);
-      ctx.fillText(`${rightHipAngle}`, rightHip[1].x - 120, rightHip[1].y + 20);
-
-      ctx.restore();
     }
-  };
+  }
 
   useEffect(() => {
-    if (!webcamRef.current || !webcamRef.current.video) return;
-      const pose: Pose = new Pose({
-        locateFile: (file: string): string => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
-        },
+    if (!isWebcamReady) return;
+
+    const pose = new Pose({
+      locateFile: (file: string): string => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`; // Latest version
+      },
     });
 
     pose.setOptions({
@@ -181,92 +210,64 @@ const BicepCurls: React.FC = () => {
 
     pose.onResults(onResult);
 
-    // Initialize pose model
-    pose.initialize().catch((error) => {
-      console.error("Pose initialization failed:", error);
-    });
-
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const videoElement = webcamRef.current?.video;
-        if (videoElement instanceof HTMLVideoElement) {
-          videoElement.srcObject = stream;
-          await new Promise<void>((resolve) => {
-            videoElement.onloadedmetadata = () => {
-              console.log("Video metadata loaded");
-              resolve();
-            };
+    pose.initialize()
+      .then(() => {
+        if (webcamRef.current?.video) {
+          camera = new cam.Camera(webcamRef.current.video, {
+            onFrame: async () => {
+              if (countTextbox.current) {
+                countTextbox.current.value = count.toString();
+              }
+              if (webcamRef.current?.video) {
+                await pose.send({ image: webcamRef.current.video });
+              }
+            },
+            width: 640,
+            height: 480,
           });
-
-          if (videoElement.readyState >= 2) {
-            cameraRef.current = new cam.Camera(videoElement, {
-              onFrame: async () => {
-                try {
-                  await pose.send({ image: videoElement });
-                } catch (error) {
-                  console.error("Pose detection error:", error);
-                }
-              },
-              width: 640,
-              height: 480,
-            });
-            await cameraRef.current.start();
-            console.log("Camera started");
-          } else {
-            console.error("Video not ready");
-          }
+          camera.start();
         }
-      } catch (error) {
-        console.error("Camera setup error:", error);
-      }
-    };
-
-    startCamera();
+      })
+      .catch((err) => console.error("Pose initialization failed:", err));
 
     return () => {
-      if (cameraRef.current) {
-        cameraRef.current.stop();
-        console.log("Camera stopped");
-      }
-      const videoElement = webcamRef.current?.video;
-      if (videoElement?.srcObject instanceof MediaStream) {
-        videoElement.srcObject.getTracks().forEach((track) => track.stop());
+      if (camera) {
+        camera.stop();
       }
     };
-  }, []);
+  }, [isWebcamReady]);
 
-  const resetCount = (): void => {
+  function resetCount(): void {
+    console.log("clicked");
     count = 0;
-    if (countTextbox.current) countTextbox.current.value = "0";
-    console.log("Counter reset");
-  };
+    speak(count);
+  }
 
   const handleClick = (): void => {
-    const ID = Cookies.get("userID");
+    const ID: string | undefined = Cookies.get("userID");
     if (ID) {
       const docRef = doc(db, `user/${ID}/bicepsCurls`, uuidv4());
-      const startTimeStamp = localStorage.getItem("bicepStartTime");
-      const endTimeVar = new Date();
-      const endTimeStamp = endTimeVar.getSeconds();
-      const timeSpent = endTimeStamp - (parseInt(startTimeStamp || "0"));
+      const startTimeStamp: string | null = localStorage.getItem("bicepStartTime");
+      const endTimeVar: Date = new Date();
+      const endTimeStamp: number = endTimeVar.getSeconds();
+      const timeSpent: number = startTimeStamp ? endTimeStamp - parseInt(startTimeStamp) : 0;
 
       setDoc(docRef, {
         reps: count,
         exerciseName: "Biceps",
-        startTimeStamp,
-        endTimeStamp,
+        startTimeStamp: startTimeStamp || "",
+        endTimeStamp: endTimeStamp,
         timeSpent: Math.abs(timeSpent),
         uid: ID,
       })
-        .then(() => console.log("Document written"))
-        .catch((error) => console.error("Firestore error:", error));
+        .then(() => console.log("Document written successfully"))
+        .catch((error) => console.error("Error writing document:", error));
     }
   };
 
   return (
     <Container
-      maxWidth="xl"
+      maxWidth="lg"
       sx={{
         display: "flex",
         width: "100%",
@@ -278,18 +279,24 @@ const BicepCurls: React.FC = () => {
         gap: "2rem",
       }}
     >
-      <Box sx={{ display: "flex", position: "relative", borderRadius: "2rem", width: "100%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          position: "relative",
+          borderRadius: "2rem",
+          width: "100%",
+        }}
+      >
         <Webcam
           ref={webcamRef}
           className="full-width"
-          videoConstraints={{ width: 640, height: 480, facingMode: "user" }}
-          onUserMedia={() => console.log("Webcam stream started")}
-          style={{ borderRadius: "2rem" }}
+          onUserMedia={() => setIsWebcamReady(true)}
+          onUserMediaError={(err) => console.error("Webcam error:", err)}
         />
         <canvas
           ref={canvasRef}
           className="full-width"
-          style={{ position: "absolute", top: 0, left: 0 }}
+          style={{ position: "absolute" }}
         />
       </Box>
       <Box
@@ -298,13 +305,12 @@ const BicepCurls: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#fff",
+          backgroundColor: "#ffff",
           borderRadius: "2rem",
           width: { lg: "40%", xs: "100%" },
-          padding: "1rem",
         }}
       >
-        <Typography variant="h4" color="primary" sx={{ textTransform: "capitalize" }}>
+        <Typography variant="h4" color="primary" style={{ textTransform: "capitalize" }}>
           Bicep Curls
         </Typography>
         <Box
@@ -318,6 +324,7 @@ const BicepCurls: React.FC = () => {
         >
           <img src="/Assets/bicep.gif" width="100%" alt="Biceps Curls" />
         </Box>
+        <br />
         <Box
           sx={{
             display: "flex",
@@ -334,6 +341,7 @@ const BicepCurls: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: "2rem",
+              padding: "1rem",
             }}
           >
             <Typography variant="h6" color="secondary">
@@ -361,12 +369,13 @@ const BicepCurls: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: "2rem",
+              borderRadius: "2rem",
             }}
           >
-            <Button variant="default" onClick={resetCount}>
+            <Button color="primary" onClick={resetCount}>
               Reset Counter
             </Button>
-            <Button variant="default" onClick={handleClick}>
+            <Button color="primary" onClick={handleClick}>
               Back
             </Button>
           </Box>

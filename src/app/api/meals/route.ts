@@ -9,43 +9,53 @@ const prisma = new PrismaClient();
 // Initialize Gemini AI
 const API_KEY = process.env.GOOGLE_API_KEY;
 
-async function generateMealSuggestionsWithGemini(userProfile: {
-    dailyCalories: number;
+export async function generateMealSuggestionsWithGemini(userProfile: {
     numberOfMeals: number;
     dietaryPreferences: string[];
     allergies: string[];
     weightGoal: string;
     activityLevel: string;
+    gender:string,
+    dailyCalories?: number; // Ensure it exists (added fallback)
 }) {
     const genAI = new GoogleGenerativeAI(API_KEY as string);
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
+    // 🔹 Ensure values are formatted correctly
+    const dietaryPreferences = userProfile.dietaryPreferences?.length
+        ? userProfile.dietaryPreferences.join(", ")
+        : "None";
+    const allergies = userProfile.allergies?.length ? userProfile.allergies.join(", ") : "None";
+    const dailyCalories = userProfile.dailyCalories || 2000; // Default to 2000 kcal if missing
+
+    // 🔹 Improved Prompt
     const prompt = `Generate ${userProfile.numberOfMeals} healthy meal suggestions with the following requirements:
-    - Total daily calories: ${userProfile.dailyCalories}
-    - Dietary preferences: ${userProfile.dietaryPreferences.join(", ")}
-    - Allergies to avoid: ${userProfile.allergies.join(", ")}
+    - Total daily calories: ${dailyCalories}
+    - Dietary preferences: ${dietaryPreferences}
+    - Allergies to avoid: ${allergies}
     - Weight goal: ${userProfile.weightGoal}
     - Activity level: ${userProfile.activityLevel}
 
-    For each meal, provide:
+    Each meal should include:
     1. Name
     2. Brief description
-    3. Calories
-    4. Macronutrients (protein, carbs, fat in grams)
+    3. Calories (number, no null values)
+    4. Macronutrients (protein, carbs, fat in grams, no null values)
     5. List of ingredients
     6. Step-by-step cooking instructions
 
-    Format the response as a JSON array with the following structure for each meal:
+    **Return only valid JSON**, no explanations or markdown.  
+    Use this format:
     [
       {
         "name": "Meal Name",
         "description": "Brief description",
-        "calories": number,
-        "protein": number,
-        "carbs": number,
-        "fat": number,
-        "ingredients": ["ingredient1", "ingredient2", ...],
-        "instructions": ["step1", "step2", ...]
+        "calories": 450,
+        "protein": 30,
+        "carbs": 50,
+        "fat": 10,
+        "ingredients": ["ingredient1", "ingredient2"],
+        "instructions": ["step1", "step2"]
       }
     ]`;
 
@@ -53,53 +63,47 @@ async function generateMealSuggestionsWithGemini(userProfile: {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        console.log("Raw Response:", text);
+        console.log("🔹 Raw Response:", text);
 
-        // Clean the response
-        const cleanedText = text
-            .replace(/```json|```/g, '') // Remove JSON code block markers
+        // 🔹 Extract JSON (handle unexpected text)
+        const jsonMatch = text.match(/\[[\s\S]*\]/); 
+        if (!jsonMatch) throw new Error("Invalid JSON response from Gemini");
+
+        let cleanedText = jsonMatch[0]
             .replace(/"protein": (\d+)g/g, '"protein": $1') // Remove 'g' from protein
             .replace(/"carbs": (\d+)g/g, '"carbs": $1') // Remove 'g' from carbs
             .replace(/"fat": (\d+)g/g, '"fat": $1') // Remove 'g' from fat
             .trim();
 
-        console.log("Cleaned Response:", cleanedText);
+        console.log("🔹 Cleaned Response:", cleanedText);
 
-        // Validate JSON format
-        const isValidJSON = (jsonString: string) => {
-            try {
-                JSON.parse(jsonString);
-                return true;
-            } catch (error) {
-                console.error("Invalid JSON:", error);
-                return false;
-            }
-        };
-
-        if (!isValidJSON(cleanedText)) {
-            throw new Error("Invalid JSON format in Gemini response");
+        // 🔹 Parse JSON & Validate
+        let meals;
+        try {
+            meals = JSON.parse(cleanedText);
+            if (!Array.isArray(meals)) throw new Error("Response is not an array");
+        } catch (error) {
+            console.error("❌ JSON Parsing Error:", error);
+            throw new Error("Failed to parse Gemini response");
         }
 
-        // Parse the cleaned JSON
-        const meals = JSON.parse(cleanedText);
-
-        // Round macronutrient values
+        // 🔹 Ensure no `null` values in macronutrients
         return meals.map((meal: any) => ({
-            name: meal.name,
-            description: meal.description,
-            calories: Math.round(meal.calories),
-            protein: Math.round(meal.protein),
-            carbs: Math.round(meal.carbs),
-            fat: Math.round(meal.fat),
-            ingredients: meal.ingredients || [],
-            instructions: meal.instructions || []
+            name: meal.name || "Unknown Meal",
+            description: meal.description || "No description available",
+            calories: typeof meal.calories === "number" ? Math.round(meal.calories) : 0,
+            protein: typeof meal.protein === "number" ? Math.round(meal.protein) : 0,
+            carbs: typeof meal.carbs === "number" ? Math.round(meal.carbs) : 0,
+            fat: typeof meal.fat === "number" ? Math.round(meal.fat) : 0,
+            ingredients: Array.isArray(meal.ingredients) ? meal.ingredients : [],
+            instructions: Array.isArray(meal.instructions) ? meal.instructions : []
         }));
+
     } catch (error) {
-        console.error("Error generating meals with Gemini:", error);
+        console.error("❌ Error generating meals with Gemini:", error);
         throw new Error("Failed to generate meal suggestions");
     }
 }
-
 export async function GET(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -130,6 +134,7 @@ export async function GET(req: NextRequest) {
             allergies: user.allergies || [], // Default to an empty array if null
             weightGoal: user.weightGoal || "maintain", // Default to "maintain" if null
             activityLevel: user.activityLevel || "moderate", // Default to "moderate" if null
+            gender:user.gender || "MALE"
         });
 
         return NextResponse.json(
@@ -163,6 +168,7 @@ export async function POST(req: NextRequest) {
         }
 
         const userData = await req.json();
+        console.log(userData);
 
         // Generate meals using Gemini
         const meals = await generateMealSuggestionsWithGemini({
@@ -171,7 +177,8 @@ export async function POST(req: NextRequest) {
             dietaryPreferences: userData.dietaryPreferences,
             allergies: userData.allergies,
             weightGoal: userData.weightGoal,
-            activityLevel: userData.activityLevel
+            activityLevel: userData.activityLevel,
+            gender:userData.gender
         });
 
         // Add unique IDs to meals

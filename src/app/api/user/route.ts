@@ -61,38 +61,61 @@ export async function POST(req: NextRequest) {
         });
 
         const prompt = `
-    Create an awesome, motivating 7-day workout plan for a ${age}-year-old ${gender} who:
-    - Weighs ${weight} lbs
-    - Is ${height} inches tall
-    - Has a fitness goal of ${fitnessGoal}
-    - Has ${activityLevel} activity level
-    - Wants to workout ${workoutDaysPerWeek} days per week
-    - Can workout for ${workoutDuration} minutes
-    - Prefers to workout at ${workoutLocation}
-    - Has access to ${availableEquipment}
-    - Prefers workout time: ${preferredWorkoutTime || 'any time'}
+Create an exciting, motivating, and personalized **7-day workout plan** for a ${age}-year-old ${gender} who:
+- **Weight:** ${weight} lbs
+- **Height:** ${height} inches
+- **Fitness Goal:** ${fitnessGoal}
+- **Activity Level:** ${activityLevel}
+- **Workout Frequency:** ${workoutDaysPerWeek} days per week
+- **Workout Duration:** ${workoutDuration} minutes per session
+- **Workout Location:** ${workoutLocation}
+- **Available Equipment:** ${availableEquipment}
+- **Preferred Workout Time:** ${preferredWorkoutTime || 'any time'}
 
-    Make the plan exciting and motivating! Include:
-    - Daily workout names with a fun twist
-    - Specific exercises (3-5 per day)
-    - Sets and reps (use numeric values for reps, avoid ranges)
-    - Rest periods (in seconds as numbers, e.g., 60, not "60s")
-    - A motivational quote for each day
-    - **For rest days,like Saturday and Sunday always include light activities (e.g., stretching, yoga, walking) instead of an empty list.**
-    Return the response as pure JSON without any markdown, code blocks, or extra text, following this structure:
-    {
-        "workoutPlan": [
-            {
-                "day": "Day 1",
-                "name": "Workout Name",
-                "exercises": [
-                    {"name": "Exercise", "sets": 3, "reps": 12, "rest": 60}
-                ],
-                "quote": "Motivational quote"
-            }
-        ]
-    }
+### **Important Guidelines for Exercise Selection**
+1. **If the workout location is home**, only suggest **bodyweight exercises** or **exercises using the available equipment** (e.g., resistance bands, dumbbells, yoga mats). Do **not** include exercises that require gym machines or barbells unless they are listed as available.
+2. **If the workout location is a gym**, include a **mix of machine-based, free weight, and bodyweight exercises**.
+3. **Always ensure the workout plan aligns with the user's fitness goal** (e.g., strength, weight loss, muscle building, endurance).
+4. **Each workout should be fun and motivating** to keep the user engaged.
+
+### **Workout Plan Structure**
+- **Each day's workout should have a creative and exciting title** (e.g., "Upper Body Power Surge" instead of "Upper Body Day").
+- **Include 3-5 exercises per day**, specifying:
+  - Exercise name
+  - Sets and reps (use exact numbers, not ranges)
+  - Rest time (numeric, e.g., 60 seconds)
+- **For rest days (Saturday and Sunday)**:
+  - Suggest **light activities** like stretching, yoga, or walking for **30 minutes**.
+  - Choose activities based on their gender and fitness goal.
+  - **Use duration (minutes) instead of sets and reps**.
+- **Each day should include a motivational quote**.
+
+### **Return Format**
+Return the response as **pure JSON** without any markdown, code blocks, or extra text. Follow this structure:
+{
+    "workoutPlan": [
+        {
+            "day": "Day 1",
+            "name": "Workout Name",
+            "exercises": [
+                {"name": "Exercise", "sets": 3, "reps": 12, "rest": 60}
+            ],
+            "quote": "Motivational quote"
+        },
+        {
+            "day": "Saturday",
+            "name": "Active Recovery",
+            "exercises": [
+                {"name": "Yoga", "duration": 30},
+                {"name": "Walking", "duration": 30}
+            ],
+            "quote": "Recovery is part of progress!"
+        }
+    ]
+}
 `;
+
+
 
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
@@ -174,55 +197,55 @@ export async function POST(req: NextRequest) {
 
 // Define the structure stored in the 'plan' Json field
 interface WorkoutPlanData {
-  workoutPlan: {
-    day: string;
-    name: string;
-    exercises: { name: string; sets: number; reps: number; rest: number }[];
-    quote: string;
-  }[];
+    workoutPlan: {
+        day: string;
+        name: string;
+        exercises: { name: string; sets: number; reps: number; rest: number }[];
+        quote: string;
+    }[];
 }
 
 // Type for the WorkoutPlan model
 interface WorkoutPlanRecord {
-  id: number;
-  userId: number;
-  plan: WorkoutPlanData;
-  createdAt: Date;
+    id: number;
+    userId: number;
+    plan: WorkoutPlanData;
+    createdAt: Date;
 }
 
 export async function GET(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.email) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
+
+        if (!user) {
+            return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
+
+        const workoutPlanRecord = await prisma.workoutPlan.findFirst({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" }, // Get the most recent plan
+        }) as WorkoutPlanRecord | null;
+
+        return NextResponse.json({
+            success: true,
+            message: "Content fetched successfully",
+            data: {
+                user: user,
+                workoutPlan: workoutPlanRecord?.plan.workoutPlan || [], // Access plan.workoutPlan safely
+            },
+        }, { status: 200 });
+    } catch (error) {
+        console.error("Error while fetching user details:", error);
+        return NextResponse.json(
+            { success: false, error: "Internal server error" },
+            { status: 500 }
+        );
     }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    const workoutPlanRecord = await prisma.workoutPlan.findFirst({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" }, // Get the most recent plan
-    }) as WorkoutPlanRecord | null;
-
-    return NextResponse.json({
-      success: true,
-      message: "Content fetched successfully",
-      data: {
-        user: user,
-        workoutPlan: workoutPlanRecord?.plan.workoutPlan || [], // Access plan.workoutPlan safely
-      },
-    }, { status: 200 });
-  } catch (error) {
-    console.error("Error while fetching user details:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
-  }
 }

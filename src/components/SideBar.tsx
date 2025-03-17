@@ -90,11 +90,11 @@ export const SideBar = () => {
 
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: Building2 },
-        {
-            href: "/workout",
-            label: "Workout",
-            icon: ShieldCheck,
-        },
+        // {
+        //     href: "/workout",
+        //     label: "Workout",
+        //     icon: ShieldCheck,
+        // },
         {
             href: "/progress",
             label: "Progress",

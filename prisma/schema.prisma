@@ -48,14 +48,24 @@ model User {
   mealsuggestion       MealSuggestion[]
   exercise             Exercise[]
   workoutPlan          WorkoutPlan[]
+  dietplan             DietPlan[]
 }
 
 model WorkoutPlan {
-  id     Int  @id @default(autoincrement())
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-  plan   Json
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  plan      Json
   createdAt DateTime @default(now())
+}
+
+model DietPlan {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  fitnessGoal String
+  dietDetails String   @db.Text
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model NutritionLog {

@@ -37,6 +37,7 @@ interface UserData {
         sets: number;
         reps: number;
         rest: number;
+        duration:number
       }[];
       quote: string;
     }[];
@@ -181,7 +182,9 @@ const Dashboard = () => {
                           <ul className="list-disc pl-5 mb-4 text-gray-700">
                             {workoutDay.exercises.map((exercise, i) => (
                               <li key={i}>
-                                {exercise.name}: {exercise.sets} sets, {exercise.reps} reps, {exercise.rest}s rest
+                                {exercise.duration   
+                                ? `${exercise.name}: ${exercise.duration} mintutes`
+                                :`${exercise.name}: ${exercise.sets} sets, ${exercise.reps} reps, ${exercise.rest}s rest`}
                               </li>
                             ))}
                           </ul>
