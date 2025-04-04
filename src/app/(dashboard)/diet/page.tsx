@@ -50,7 +50,7 @@ export default function DietPage() {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">Diet Suggestion</h1>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-1">
+            <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-1 gap-4">
                 {dietData.map((item) => (
                     <Card key={item.id} className="w-96 rounded-xl p-4 shadow-lg overflow-hidden border border-gray-200" onClick={() => handleClick(item.route)}>
                         <Image

@@ -39,7 +39,7 @@ const Page = () => {
       </div>
 
       {/* Card Grid */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center'>
         {trainData.map((item) => (
           <Link key={item.id} href={`/train/${item.id}`} passHref>
             <Card className='w-full md:w-80 rounded-2xl cursor-pointer shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300'>

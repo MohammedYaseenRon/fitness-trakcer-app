@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
 
           {/* Image Container */}
           <div className="flex-1">
-            <div className="relative h-[400px] w-full max-w-[500px] lg:h-[500px]">
+            <div className="relative w-[400px] h-[400px] lg:w-[500px] lg:h-[500px]">
               <Image
                 src="/Assets/fitness.png"
                 alt="Fitness"

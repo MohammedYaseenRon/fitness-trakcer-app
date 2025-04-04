@@ -16,7 +16,7 @@ export const Info: React.FC<InfoProps> = ({ title, description, imageSrc, imageA
         <p className="text-2xl text-gray-500">{description}</p>
       </div>
       <div className="flex-1">
-        <div className="relative w-[500px] h-[400px]">
+        <div className="relative w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] rounded-2xl overflow-hidden">
           <Image
             src={imageSrc}
             alt={imageAlt}

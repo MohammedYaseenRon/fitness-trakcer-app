@@ -38,7 +38,7 @@ export function Mainpage() {
     ], [])
 
     return (
-        <div className="bg-gradient-to-b from-white to-gray-50">
+        <div className="w-full">
             <Header />
             {/* All-In-One Solution Section */}
             <section className="px-4 py-24 sm:px-6 lg:px-8" id="Intro">

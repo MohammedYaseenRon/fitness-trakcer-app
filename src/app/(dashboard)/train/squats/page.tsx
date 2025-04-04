@@ -45,6 +45,7 @@ const Squats: React.FC = () => {
 
   const speak = (value: number): void => {
     if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(value.toString());
       utterance.lang = "en-US";
       window.speechSynthesis.speak(utterance);
@@ -96,13 +97,13 @@ const Squats: React.FC = () => {
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-        // Define squat ranges
-        const inRangeRightKneeDown: boolean = rightKneeAngle <= 90; // Squat down
-        const inRangeLeftKneeDown: boolean = leftKneeAngle <= 90; // Squat down
-        const inRangeRightKneeUp: boolean = rightKneeAngle >= 170; // Standing
-        const inRangeLeftKneeUp: boolean = leftKneeAngle >= 170; // Standing
-        const inRangeRightHip: boolean = rightHipAngle >= 170 && rightHipAngle <= 180;
-        const inRangeLeftHip: boolean = leftHipAngle >= 170 && leftHipAngle <= 180;
+        // Adjusted squat ranges
+        const inRangeRightKneeDown: boolean = rightKneeAngle <= 110; // Relaxed squat down
+        const inRangeLeftKneeDown: boolean = leftKneeAngle <= 110;   // Relaxed squat down
+        const inRangeRightKneeUp: boolean = rightKneeAngle >= 150;   // Relaxed standing
+        const inRangeLeftKneeUp: boolean = leftKneeAngle >= 150;     // Relaxed standing
+        const inRangeRightHip: boolean = rightHipAngle >= 140 && rightHipAngle <= 180;
+        const inRangeLeftHip: boolean = leftHipAngle >= 140 && leftHipAngle <= 180;
 
         // Draw lines for visualization
         for (let i = 0; i < 2; i++) {
@@ -148,7 +149,7 @@ const Squats: React.FC = () => {
           canvasCtx.fill();
         }
 
-        // Full cycle counting: down → up
+        // Full cycle counting with debugging
         if (
           inRangeLeftKneeDown &&
           inRangeRightKneeDown &&
@@ -156,7 +157,13 @@ const Squats: React.FC = () => {
           inRangeLeftHip &&
           dir === 0
         ) {
-          dir = 1; // Squat down detected, wait for standing
+          dir = 1; // Squat down detected
+          console.log("Squat Down Detected - Angles:", {
+            leftKnee: leftKneeAngle,
+            rightKnee: rightKneeAngle,
+            leftHip: leftHipAngle,
+            rightHip: rightHipAngle,
+          });
         } else if (
           inRangeLeftKneeUp &&
           inRangeRightKneeUp &&
@@ -167,7 +174,12 @@ const Squats: React.FC = () => {
           setCount((prev) => {
             const newCount = prev + 1;
             speak(newCount);
-            console.log("Squat completed:", newCount);
+            console.log("Squat Completed - Count:", newCount, {
+              leftKnee: leftKneeAngle,
+              rightKnee: rightKneeAngle,
+              leftHip: leftHipAngle,
+              rightHip: rightHipAngle,
+            });
             return newCount;
           });
           dir = 0; // Standing detected, rep complete
